@@ -17,6 +17,7 @@
 - Az IP-címedet csak **titkosított (hash-elt) formában**, néhány óráig tároljuk, hogy a szolgáltatással ne lehessen visszaélni.
 - A családi funkcióban a család tagjai **csak annyit látnak**, hogy melyik szervezet nevében érkezett PIROS üzenet, és mikor. Az üzenet tartalmát nem.
 - Nincs reklám, nincs látogatottságmérés, nincs marketing. **Adatot nem adunk el.**
+- **Tiltakozhatsz** az IP-címed és a használati számláló visszaélés-megelőzési célú kezelése ellen ([10.1. pont](#101-tiltakozási-jog)).
 - Bármikor kérhetsz tájékoztatást, törlést vagy mást: **patrik@sidekickautomations.hu**.
 
 ---
@@ -46,7 +47,8 @@ A tájékoztató a Rákattintsak? webes alkalmazásra (a továbbiakban: **Szolg�
 - az elektronikus kereskedelmi szolgáltatások, valamint az információs társadalommal összefüggő szolgáltatások egyes kérdéseiről szóló **2001. évi CVIII. törvény (Ekertv.)**;
 - a Polgári Törvénykönyvről szóló **2013. évi V. törvény (Ptk.)**;
 - a fogyasztóvédelemről szóló **1997. évi CLV. törvény (Fgytv.)**;
-- a végberendezésen történő tárolásra az elektronikus hírközlésről szóló törvény ([7. fejezet](#7-mit-tárolunk-a-készülékeden-sütik-és-helyi-tároló)).
+- a végberendezésen történő tárolásra az elektronikus hírközlésről szóló **2003. évi C. törvény (Eht.) 155. § (4) bekezdése** ([7. fejezet](#7-mit-tárolunk-a-készülékeden-sütik-és-helyi-tároló));
+- a mesterséges intelligenciáról szóló **(EU) 2024/1689 rendelet** (MI-rendelet) átláthatósági szabályai ([Jogi nyilatkozat](jogi-nyilatkozat.md)).
 
 ## 3. Hogyan működik a Szolgáltatás? (amit az adatkezeléshez tudnod kell)
 
@@ -65,11 +67,13 @@ A tájékoztató a Rákattintsak? webes alkalmazásra (a továbbiakban: **Szolg�
 | **Adatok** | A bemásolt szöveg vagy a képernyőkép, és minden, ami benne van. Ez lehet a te adatod, vagy más személyek adata: a feladó telefonszáma vagy neve, egy megszólítás, egy link. |
 | **Cél** | Az általad kért ellenőrzés elvégzése és az eredmény megjelenítése. |
 | **Jogalap** | A saját adataid esetében a **GDPR 6. cikk (1) bekezdés b) pontja**: a Szolgáltatás nyújtása a [Felhasználási feltételek](felhasznalasi-feltetelek.md) szerint. Az üzenetben szereplő más személyek adatai esetében a **GDPR 6. cikk (1) bekezdés f) pontja**: a csalás elleni védekezéshez fűződő jogos érdeked és a mi jogos érdekünk ([12. fejezet](#12-érdekmérlegelés-összefoglaló)). |
-| **Megőrzés** | **Nálunk semeddig.** A tartalom csak a kérés feldolgozásáig, a szerver memóriájában él: jellemzően néhány másodpercig, legfeljebb 60 másodpercig (ennyi a szerverfunkció időkorlátja). Nem kerül adatbázisba, naplóba vagy fájlba. Ezt minden kódváltozásnál egy automatikus ellenőrzés (`check:privacy`) vizsgálja. Az **Anthropic** a feltételei szerint a be- és kimenetet **30 napon belül törli**. Ha a rendszere a tartalmat a felhasználási szabályzatába ütközőnek jelöli meg, legfeljebb **2 évig** őrizheti meg, a biztonsági besorolás eredményét legfeljebb **7 évig**. Részletek: [5. fejezet](#5-kik-férnek-hozzá-az-adataidhoz-címzettek). |
+| **Megőrzés** | **Nálunk semeddig.** A tartalom csak a kérés feldolgozásáig, a szerver memóriájában él: jellemzően néhány másodpercig, legfeljebb 60 másodpercig (ennyi a szerverfunkció időkorlátja). Nem kerül adatbázisba, naplóba vagy fájlba. Ezt minden kódváltozásnál egy automatikus ellenőrzés (`check:privacy`) vizsgálja. **Az Anthropic a be- és kimenetet 30 napon belül törli**¹, és nem tanít rajta modellt. Részletek: [5. fejezet](#5-kik-férnek-hozzá-az-adataidhoz-címzettek). |
 
-> **Kérünk, ne küldj be felesleges személyes adatot.** A képernyőképen takard le vagy vágd le, ami nem kell az ellenőrzéshez: saját név, számlaszám, lakcím. **Különleges adatot** (például egészségügyi adatot) se küldj be. Ha egy üzenetben mégis van ilyen, azt kifejezetten nem kívánjuk kezelni, és a fentiek szerint nem tároljuk.
+<sub>¹ Kivétel az Anthropic feltételei szerint: ha a rendszere egy tartalmat a felhasználási szabályzatába ütközőnek jelöl meg, a be- és kimenetet legfeljebb 2 évig, a biztonsági besorolás eredményét legfeljebb 7 évig őrizheti meg.</sub>
 
-**Más személyek adatai (GDPR 14. cikk).** Az üzenetben szereplő személyek (például a feladó) adatait nem tőlük, hanem tőled kapjuk. Őket külön nem tájékoztatjuk. Nem tudjuk, kik ők, az adatukat nem tároljuk, és a feldolgozás csak másodpercekig tart. Ezért a tájékoztatásuk lehetetlen vagy aránytalan erőfeszítést igényelne (GDPR 14. cikk (5) bekezdés b) pont). Ez a tájékoztató nyilvános, így rájuk is vonatkozik.
+> **Kérünk, ne küldj be felesleges személyes adatot.** A képernyőképen takard le vagy vágd le, ami nem kell az ellenőrzéshez: saját név, számlaszám, lakcím, jelszó, PIN-kód, bankkártyaszám. **Különleges adatot** (például egészségügyi adatot) se küldj be. Ha egy üzenetben mégis van ilyen, azt csak az ellenőrzéshez használjuk, a fentiek szerint nem tároljuk, és semmilyen következtetést nem vonunk le belőle rólad.
+
+Az üzenetben szereplő más személyekre (például a feladóra) vonatkozó tájékoztatást a [4.9. pont](#49-ha-a-te-adataid-szerepelnek-egy-nekünk-beküldött-üzenetben-gdpr-14-cikk) tartalmazza.
 
 ### 4.2. A linkek ellenőrzése
 
@@ -86,7 +90,7 @@ A tájékoztató a Rákattintsak? webes alkalmazásra (a továbbiakban: **Szolg�
 
 | | |
 |---|---|
-| **Adatok** | Az IP-címed **sózott SHA-256 hash-e**. Ez egy titkos kulccsal képzett, visszafejthetetlen ujjlenyomat, magát az IP-címet nem tároljuk. Tárolt mezők: `rate_limits` tábla: `ip_hash`, `window_start` (az óra kezdete), `count` (az abban az órában végzett ellenőrzések száma). |
+| **Adatok** | Az IP-címed **sózott SHA-256 hash-e**. Ez egy titkos kulccsal képzett ujjlenyomat, amelyből a kulcs nélkül az IP-cím nem állítható vissza. Magát az IP-címet nem tároljuk. Tárolt mezők: `rate_limits` tábla: `ip_hash`, `window_start` (az óra kezdete), `count` (az abban az órában végzett ellenőrzések száma). |
 | **Cél** | Egy hálózatból óránként legfeljebb 20 ellenőrzés indulhasson. Ez megvédi a Szolgáltatást a tömeges, automatizált visszaéléstől és az ebből eredő költségektől, így a Szolgáltatás mindenkinek ingyenes és elérhető maradhat. |
 | **Jogalap** | GDPR 6. cikk (1) bekezdés f) pont, jogos érdek ([12. fejezet](#12-érdekmérlegelés-összefoglaló)). |
 | **Megőrzés** | A sor az óra kezdetétől számított **2 óra elteltével, a következő ellenőrzés során** törlődik. Ha közben senki nem ellenőriz, a törlés addig vár. Egy 10:00 és 10:59 között létrejött sor 12:00 után törölhetővé válik, és az első ezután érkező ellenőrzés törli. |
@@ -147,13 +151,28 @@ A családi funkcióval egy családtag (a továbbiakban: **unoka**) figyelmeztet�
 
 Az e-mailjeinket a **Google Ireland Limited** levelezőrendszere kezeli adatfeldolgozóként.
 
+### 4.9. Ha a te adataid szerepelnek egy nekünk beküldött üzenetben (GDPR 14. cikk)
+
+Ez a pont annak szól, **akinek az adata egy olyan üzenetben szerepel, amelyet valaki más ellenőrzésre beküldött**. Ilyen például az SMS feladója, vagy egy név, egy telefonszám, egy link az üzenetben.
+
+| | |
+|---|---|
+| **Honnan kaptuk?** | Attól a felhasználótól, aki az üzenetet megkapta, és beküldte ellenőrzésre. |
+| **Milyen adat?** | Ami az üzenetben szerepel: jellemzően telefonszám, név, e-mail-cím, link, a szöveg maga. |
+| **Mire használjuk?** | Csak arra, hogy megállapítsuk, csalásra utal-e az üzenet ([4.1.](#41-a-beküldött-üzenet-ellenőrzése) és [4.2. pont](#42-a-linkek-ellenőrzése)). Rólad nem hozunk döntést, és nem építünk rólad profilt. |
+| **Jogalap** | GDPR 6. cikk (1) bekezdés f) pont: a címzett és a mi jogos érdekünk a csalás elleni védekezésben ([12. fejezet](#12-érdekmérlegelés-összefoglaló)). |
+| **Kinek adjuk át?** | Az Anthropicnak a kiolvasáshoz ([5. fejezet](#5-kik-férnek-hozzá-az-adataidhoz-címzettek)). |
+| **Meddig?** | Nálunk csak a kérés idejére (legfeljebb 60 másodperc), az Anthropicnál 30 napon belül törlődik. |
+
+**Miért nem értesítünk téged külön?** Nem tudjuk, ki vagy. Az üzenetet nem tároljuk, így később sem tudnánk kapcsolatba lépni veled. Csaló feladó esetén az értesítés meghiúsítaná a védekezést. Ezért az egyéni tájékoztatás lehetetlen, és veszélyeztetné az adatkezelés célját (GDPR 14. cikk (5) bekezdés b) pont). Helyette ezt a tájékoztatót nyilvánosan elérhetővé tesszük. A [10. fejezet](#10-milyen-jogaid-vannak) szerinti jogok és a [11. fejezet](#11-jogorvoslat) szerinti jogorvoslat téged is megilletnek.
+
 ## 5. Kik férnek hozzá az adataidhoz? (címzettek)
 
 Az adataidhoz az Üzemeltetőn belül csak **Nagy Patrik** fér hozzá, és csak a fenti célokra. Ezen kívül az alábbi szolgáltatókat vesszük igénybe. Adatfeldolgozóként csak a mi utasításunkra, a velük kötött adatfeldolgozási szerződés szerint dolgozhatnak (GDPR 28. cikk).
 
 | Címzett | Szerep | Milyen adat | Hol | Továbbítási garancia |
 |---|---|---|---|---|
-| **Anthropic Ireland, Limited**, 6th Floor, South Bank House, Barrow Street, Dublin 4, D04 TR29, Írország (anyavállalata: Anthropic, PBC, 548 Market St, PMB 90375, San Francisco, CA 94104, USA) | adatfeldolgozó: a mesterséges intelligencia általi kiolvasás | a beküldött szöveg vagy kép és a modell válasza | Az adatokat az **USA-ban** tárolja, a feldolgozás a globális infrastruktúráján történhet. | az Európai Bizottság **általános adatvédelmi kikötései** (SCC), az Anthropic adatfeldolgozási feltételeinek része |
+| **Anthropic Ireland, Limited**, 6th Floor, South Bank House, Barrow Street, Dublin 4, D04 TR29, Írország (anyavállalata: Anthropic, PBC, 548 Market St, PMB 90375, San Francisco, CA 94104, USA) | adatfeldolgozó: a mesterséges intelligencia általi kiolvasás (az Anthropic, PBC a lánc további adatfeldolgozója) | a beküldött szöveg vagy kép és a modell válasza | Az adatokat az **USA-ban** tárolja, a feldolgozás a globális infrastruktúráján történhet. | az Európai Bizottság **általános adatvédelmi kikötései** (SCC), az Anthropic adatfeldolgozási feltételeinek része |
 | **Vercel Inc.**, 440 N Barranca Ave #4133, Covina, CA 91723, USA | adatfeldolgozó: tárhely és a szerverprogram futtatása | minden kérés technikai adatai (IP-cím, böngészőazonosító, kért cím), a kérés tartalma átfutás közben | A weboldalt a hozzád legközelebbi szerver szolgálja ki. A szerverprogram (az ellenőrzés) jelenleg az **USA-ban** (Washington, D.C.) fut. | **EU–USA Adatvédelmi Keretrendszer** (a Vercel tanúsított résztvevő) és általános adatvédelmi kikötések |
 | **Supabase Pte. Ltd.**, 65 Chulia Street #38-02/03, OCBC Centre, Szingapúr 049513 | adatfeldolgozó: adatbázis, bejelentkezés, valós idejű riasztás | névtelen azonosító, munkamenet (IP-cím, böngészőazonosító), Google-fiókadatok, használati számláló, IP-hash, család, tagság, riasztás | Az adatbázis és a bejelentkezés **az EU-ban, Írországban** (eu-west-1) fut. A naplók, a mentések és a Supabase alvállalkozói az EU-n kívül is lehetnek. | általános adatvédelmi kikötések (SCC), a Supabase adatfeldolgozási feltételeinek része |
 | **Google Ireland Limited**, Gordon House, Barrow Street, Dublin 4, Írország | **önálló adatkezelő** a Google-bejelentkezésnél; **adatfeldolgozó** az e-mail-levelezésünknél | Google-bejelentkezésnél a bejelentkezés ténye; levelezésnél a leveleid | EU, illetve a Google globális infrastruktúrája | a Google LLC az **EU–USA Adatvédelmi Keretrendszer** tanúsított résztvevője |
@@ -172,11 +191,11 @@ Adatot **nem adunk el**, reklámcélra nem adunk át, és nem használjuk profil
 
 A fenti táblázat szerint egyes adatok az **Európai Gazdasági Térségen kívülre**, elsősorban az **Egyesült Államokba** és **Szingapúrba** kerülnek, vagy onnan is hozzáférhetők. Ez három módon történik:
 
-- **Beküldött üzenet (Anthropic):** az Anthropic adatfeldolgozási feltételeibe épített, az Európai Bizottság által elfogadott **általános adatvédelmi kikötések** alapján (GDPR 46. cikk (2) bekezdés c) pont). Az Anthropic nem szerepel az EU–USA Adatvédelmi Keretrendszer résztvevői között.
-- **Tárhely (Vercel):** az Európai Bizottság 2023. július 10-i megfelelőségi határozata (**EU–USA Adatvédelmi Keretrendszer**, GDPR 45. cikk) alapján. Ezt kiegészítik az általános adatvédelmi kikötések.
-- **Adatbázis (Supabase):** az adatbázis az EU-ban van. Ha a Supabase vagy az alvállalkozói az EU-n kívülről férnek hozzá, arra az **általános adatvédelmi kikötések** vonatkoznak.
+- **Beküldött üzenet (Anthropic) → USA:** az Anthropic adatfeldolgozási feltételeibe épített, a Bizottság (EU) 2021/914 végrehajtási határozatával elfogadott **általános adatvédelmi kikötések** alapján (GDPR 46. cikk (2) bekezdés c) pont). Az Anthropic nem szerepel az EU–USA Adatvédelmi Keretrendszer résztvevői között. A feltételek: https://www.anthropic.com/legal/data-processing-addendum
+- **Tárhely (Vercel) → USA:** a Bizottság 2023. július 10-i (EU) 2023/1795 végrehajtási határozata (**EU–USA Adatvédelmi Keretrendszer**, GDPR 45. cikk) alapján, mert a Vercel Inc. a keretrendszer tanúsított résztvevője. Ezt a Vercel adatfeldolgozási feltételeibe épített általános adatvédelmi kikötések egészítik ki. A feltételek: https://vercel.com/legal/dpa
+- **Adatbázis (Supabase) → Szingapúr, USA:** az adatbázis és a bejelentkezés az EU-ban (Írországban) fut. A szerződő fél szingapúri. A naplókhoz, a mentésekhez és a támogatáshoz a Supabase és az alvállalkozói az EU-n kívülről is hozzáférnek. Ezekre a Supabase adatfeldolgozási feltételeibe épített **általános adatvédelmi kikötések** vonatkoznak (GDPR 46. cikk (2) bekezdés c) pont). A feltételek: https://supabase.com/legal/dpa
 
-A kikötések egy példányát kérésedre megküldjük, illetve a szolgáltatók nyilvános oldalain is elérhetők.
+A kikötések egy példányát kérésedre is megküldjük.
 
 ## 7. Mit tárolunk a készülékeden? (sütik és helyi tároló)
 
@@ -186,11 +205,11 @@ A kikötések egy példányát kérésedre megküldjük, illetve a szolgáltató
 |---|---|---|---|
 | Bejelentkezési munkamenet (`sb-…-auth-token`; Google-összekötés közben átmenetileg `sb-…-auth-token-code-verifier`) | localStorage | A névtelen vagy mentett fiókod felismerése, a napi korlát, a családi funkció | Kijelentkezésig, illetve amíg a böngésző adatait nem törlöd |
 | Nagyi mód beállítás (`rakattintsak.nagyi`) | localStorage | Megjegyzi, hogy a nagyobb, egyszerűbb nézetet kérted | Amíg át nem állítod, vagy a böngésző adatait nem törlöd |
-| Megosztott tartalom (`rakattintsak-share-v1`) | Cache API | Ha a telefon „Megosztás” menüjéből küldesz üzenetet, az itt vár, amíg az ellenőrzés sikerül. **Addig nem megy szerverre.** | A sikeres ellenőrzés után törlődik |
+| Megosztott tartalom (`rakattintsak-share-v1`) | Cache API | Ha a telefon „Megosztás” menüjéből küldesz üzenetet, az itt vár, amíg az ellenőrzés sikerül. **Addig nem megy szerverre.** | A sikeres ellenőrzés után törlődik. Ha az ellenőrzés nem sikerül, az újrapróbáláshoz megmarad, amíg sikerrel újra nem próbálod, vagy a böngésző adatait nem törlöd. |
 | Szervizprogram (service worker) | böngésző | A megosztás fogadása és a családi értesítések megjelenítése | Amíg a böngésző adatait nem törlöd |
 | Értesítési engedély | böngésző | Csak ha a családi oldalon engedélyezed | Amíg vissza nem vonod a böngésző beállításaiban |
 
-Ezek mindegyike **feltétlenül szükséges** ahhoz, hogy az általad kifejezetten kért szolgáltatást nyújtsuk. Ezért hozzájárulást nem kérünk hozzájuk, és süti-sávot sem jelenítünk meg. A tárolt adatokat a böngésződ beállításaiban bármikor törölheted. Ilyenkor a névtelen fiókod elvész a készülékről, a Google-lal mentett fiókodba viszont újra be tudsz lépni.
+A végberendezésen történő tárolásról az Eht. 155. § (4) bekezdése rendelkezik. A NAIH gyakorlata szerint a **feltétlenül szükséges** tároláshoz, például a bejelentkezéshez, a felhasználó által kért beállításhoz és a felhasználó által bevitt tartalomhoz nem kell hozzájárulás, elég a tájékoztatás. A NAIH ebben a 29. cikk szerinti munkacsoport 4/2012. számú véleményét tekinti irányadónak. A fenti tárolások ezt a célt szolgálják: nélkülük az általad kért szolgáltatás nem működik. A tárolt adatokat a böngésződ beállításaiban bármikor törölheted. Ilyenkor a névtelen fiókod elvész a készülékről, a Google-lal mentett fiókodba viszont újra be tudsz lépni.
 
 ## 8. Automatizált döntéshozatal
 
@@ -204,13 +223,28 @@ Az ítélet **automatikusan**, emberi közreműködés nélkül születik. **Kiz
 - A pontszám alapján: 0–24 pont SZÜRKE, 25–39 pont SÁRGA, 40 ponttól PIROS.
 - Az eredménynél megmutatjuk, milyen jelek alapján döntöttünk.
 
+**Példa arra, mi változtat az eredményen** (tegyük fel, hogy más jel nincs az üzenetben):
+- Az üzenet határidőt szab (10 pont), linkre kattintásra kér (10 pont), és a link a szervezet hivatalos oldalára mutat: 20 pont, **SZÜRKE**.
+- Ugyanez, de a link egy listánkon nem szereplő oldalra visz (5 pont): 25 pont, **SÁRGA**.
+- Ha a link rövidített cím (15 pont az 5 helyett): 35 pont, **SÁRGA**.
+- Ha az üzenet emellett pénzátutalást is kér (30 pont): 65 pont, **PIROS**.
+- Ha az üzenet jelszót, kártyaadatot vagy egy kapott kód továbbadását kéri, vagy a link egy ismert szervezet hivatalos címét utánozza, az kemény szabály: pontszámtól függetlenül **PIROS**.
+- Ha az üzenet minden linkje a szervezet hivatalos oldalára mutat, az ítélet legfeljebb **SÁRGA** lehet. Kemény szabály esetén ez a korlát nem érvényes.
+- Ha a képernyőkép nehezen olvasható, az ítélet legalább **SÁRGA**.
+
 **Profilalkotást nem végzünk.** A napi számláló (`red_count`) csak összesített darabszám, nem értékelünk vele téged.
 
 ## 9. Korhatár
 
-A Szolgáltatást **16 éves kor felett** veheted igénybe. 16 év alatt csak akkor, ha a szülőd (törvényes képviselőd) hozzájárult, vagy a nevedben ő engedélyezte. Ez a GDPR 8. cikkéhez igazodik, amely az információs társadalommal összefüggő szolgáltatásoknál a gyermek hozzájárulásának korhatárát Magyarországon 16 évben határozza meg. Ha tudomásunkra jut, hogy 16 év alatti személy szülői hozzájárulás nélkül mentett fiókot vagy családot hozott létre, az adatait töröljük.
+A Szolgáltatást **16 éves kortól** veheted igénybe. 16 év alatt csak a szülőd (törvényes képviselőd) hozzájárulásával. A korhatárt mi határoztuk meg. A kiskorúak szerződéskötésére a Ptk. 2:10–2:14. §-a az irányadó. Adatkezelésünk nem hozzájáruláson alapul, ezért a GDPR 8. cikke nem alkalmazandó rá. Ha tudomásunkra jut, hogy 16 év alatti személy a szülője hozzájárulása nélkül mentett fiókot vagy családot hozott létre, a fiókját és a hozzá tartozó adatokat töröljük.
 
 ## 10. Milyen jogaid vannak?
+
+### 10.1. Tiltakozási jog
+
+> **Bármikor tiltakozhatsz** az ellen, hogy jogos érdek alapján kezeljük az adataidat (GDPR 21. cikk). Ide tartozik az IP-címed hash-e az óránkénti korláthoz, a névtelen fiókodhoz tartozó napi számláló, az üzemeltetési naplók, és a rólad szóló adat egy más által beküldött üzenetben. Írj a **patrik@sidekickautomations.hu** címre. Tiltakozásod után az adatot csak akkor kezeljük tovább, ha bizonyítjuk, hogy olyan kényszerítő erejű jogos ok indokolja, amely elsőbbséget élvez az érdekeiddel, jogaiddal és szabadságaiddal szemben, vagy jogi igény érvényesítéséhez kell.
+
+### 10.2. További jogaid
 
 | Jog | Mit jelent |
 |---|---|
@@ -220,7 +254,7 @@ A Szolgáltatást **16 éves kor felett** veheted igénybe. 16 év alatt csak ak
 | **Korlátozás** (18. cikk) | Kérheted, hogy egy ideig csak tároljuk az adatot, de ne használjuk. Ilyen eset például, amíg egy vitát tisztázunk. |
 | **Értesítés** (19. cikk) | Ha helyesbítünk, törlünk vagy korlátozunk, erről értesítjük azokat, akiknek az adatot továbbítottuk, és kérésedre megmondjuk, kik ők. |
 | **Adathordozhatóság** (20. cikk) | A szerződés alapján kezelt, általad megadott adataidat géppel olvasható formában kikérheted. |
-| **Tiltakozás** (21. cikk) | Tiltakozhatsz a jogos érdeken (f) pont) alapuló adatkezelés ellen. Ilyenkor csak akkor folytatjuk, ha kényszerítő erejű jogos ok áll fenn. |
+| **Tiltakozás** (21. cikk) | Lásd a [10.1. pontot](#101-tiltakozási-jog). |
 | **Automatizált döntés** (22. cikk) | Jogod van arra, hogy ne kizárólag automatizált döntés alapján hozzanak rólad joghatással járó döntést. Ilyen döntést nem hozunk ([8. fejezet](#8-automatizált-döntéshozatal)). |
 
 **Hogyan élhetsz a jogaiddal?** Írj a **patrik@sidekickautomations.hu** címre. **Egy hónapon belül** válaszolunk (GDPR 12. cikk (3) bekezdés). Ha a kérelem bonyolult, vagy sok kérelem érkezik, ez további két hónappal meghosszabbodhat. Ilyenkor az első hónapon belül jelezzük a késést és az okát. A válasz **ingyenes**.
@@ -240,9 +274,9 @@ Ha úgy érzed, hogy megsértettük az adatvédelmi jogaidat, először írj nek
 | Postacím | 1363 Budapest, Pf. 9. |
 | E-mail | ugyfelszolgalat@naih.hu |
 | Telefon | +36 1 391 1400 |
-| Web | https://naih.hu |
+| Web | https://naih.hu (online ügyindítás: https://naih.hu/online-ugyinditas) |
 
-**Bírósághoz is fordulhatsz** (GDPR 79. cikk, Infotv. 23. §). A per elbírálása a **törvényszék** hatáskörébe tartozik. A pert választásod szerint a lakóhelyed vagy tartózkodási helyed szerint illetékes törvényszék előtt is megindíthatod. A törvényszékek listája: https://birosag.hu/torvenyszekek.
+**Bírósághoz is fordulhatsz** (GDPR 79. cikk, Infotv. 23. §). A pert választásod szerint a lakóhelyed vagy tartózkodási helyed szerint illetékes **törvényszék** előtt is megindíthatod. A bíróságok elérhetősége: https://birosag.hu.
 
 ## 12. Érdekmérlegelés (összefoglaló)
 
@@ -255,7 +289,7 @@ Ahol a jogalap a jogos érdek (GDPR 6. cikk (1) bekezdés f) pont), háromlépcs
 | Napi korlát a névtelen fiókhoz (4.4.) | Ugyanaz, mint fent, felhasználónként | Az IP-korlát egy közös hálózatból (például egy idősotthon wifijéről) túl szigorú lenne, a felhasználónkénti korlát méltányosabb. | Névtelen azonosító, csak darabszám. Személyazonosság nincs hozzárendelve. **Az érdek elsőbbséget élvez.** |
 | Üzemeltetési naplók (4.7.) | A Szolgáltatás biztonságos, hibamentes működtetése | Tárhelyszolgáltatás naplózás nélkül nem működtethető biztonságosan | Rövid (1–7 napos) megőrzés, a naplókat a mi kódunk nem egészíti ki tartalommal. **Az érdek elsőbbséget élvez.** |
 
-Az érdekmérlegelés részletes szövegét kérésedre megküldjük.
+Az érdekmérlegelésről kérésedre további tájékoztatást adunk.
 
 ## 13. Adatbiztonság
 

@@ -28,6 +28,18 @@ const navigation: {
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  if (pathname === "/" || pathname === "/csalad") {
+    return (
+      <div className="home-shell">
+        <a href="#main-content" className="skip-link">
+          Ugrás a tartalomhoz
+        </a>
+        <div className="home-content" id="main-content" tabIndex={-1}>
+          {children}
+        </div>
+      </div>
+    );
+  }
   const current =
     navigation.find((item) => item.href === pathname)?.label ??
     "Használati útmutató";

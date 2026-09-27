@@ -11,6 +11,7 @@ import {
   type ChangeEvent,
   type DragEvent,
   type FormEvent,
+  type KeyboardEvent,
 } from "react";
 import { resizeImage } from "@/lib/image-resize";
 import {
@@ -242,6 +243,12 @@ export default function CheckForm() {
     void runCheck(text, image?.dataUrl ?? null);
   }
 
+  function onComposerKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key !== "Enter" || e.shiftKey || e.nativeEvent.isComposing) return;
+    e.preventDefault();
+    e.currentTarget.form?.requestSubmit();
+  }
+
   const busy = loading || preparingImage;
 
   return (
@@ -254,19 +261,10 @@ export default function CheckForm() {
       )}
       <form
         onSubmit={onSubmit}
-        className="panel check-panel"
+        className="check-form"
         aria-label="Üzenet ellenőrzése"
         aria-busy={busy}
       >
-        <div className="panel-heading">
-          <span className="section-icon">
-            <Icon name="message" />
-          </span>
-          <div>
-            <h2>Mit szeretnél ellenőrizni?</h2>
-            <p>SMS, e-mail, link vagy képernyőkép</p>
-          </div>
-        </div>
         <div
           className={`check-composer${draggingImage ? " is-dragging" : ""}`}
           onDragOver={onDragOver}
@@ -276,12 +274,15 @@ export default function CheckForm() {
           onDrop={onDrop}
         >
           <label htmlFor="check-message" className="sr-only">
-            Másold ide az üzenetet vagy a linket
+            Másold ide az üzenetet vagy a linket. Enterrel indíthatod az ellenőrzést,
+            Shift és Enter billentyűkkel új sort kezdhetsz.
           </label>
           <textarea
             id="check-message"
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onKeyDown={onComposerKeyDown}
+            enterKeyHint="send"
             rows={3}
             className="check-textarea"
             placeholder="Írd vagy másold be az üzenetet vagy a linket…"
@@ -322,28 +323,20 @@ export default function CheckForm() {
             >
               <Icon name="plus" />
             </button>
-            <button
-              type="submit"
-              disabled={busy}
-              className="composer-send"
-              aria-label={loading ? "Ellenőrzés folyamatban" : "Üzenet küldése ellenőrzésre"}
-              title={loading ? "Ellenőrzöm…" : "Küldés"}
-            >
-              {loading ? <span className="spinner" aria-hidden="true" /> : <Icon name="send" />}
-            </button>
           </div>
         </div>
+        <p className="chat-disclaimer">
+          Az ellenőrzés támpontot ad. A gyanús jelek hiánya önmagában nem igazolja
+          az üzenet hitelességét.
+        </p>
         {imageError && (
           <p role="alert" className="notice notice-error mt-4">
             <Icon name="alert" />
             {imageError}
           </p>
         )}
-        <p role="status" className={loading ? "loading-status" : "sr-only"}>
+        <p role="status" className="sr-only">
           {loading ? "Az ellenőrzés folyamatban van. Néhány másodperc." : ""}
-        </p>
-        <p className="privacy-note">
-          <Icon name="lock" />A beküldött üzenetet és képet nem mentjük el.
         </p>
       </form>
       {error && (

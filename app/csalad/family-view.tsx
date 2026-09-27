@@ -117,7 +117,7 @@ export default function FamilyView() {
     <div className="stack">
       {oauthProblem && <OAuthBanner problem={oauthProblem} />}
       {view.kind === "loading" && (
-        <p className="panel loading-status" role="status">
+        <p className="loading-status" role="status">
           <span className="spinner" aria-hidden="true" />
           Családi védőháló betöltése…
         </p>
@@ -129,7 +129,7 @@ export default function FamilyView() {
       )}
       {view.kind === "signed_out" && <SignedOut />}
       {view.kind === "load_failed" && (
-        <section className="panel stack">
+        <section className="stack">
           <p className="notice notice-error">
             A családi adatokat most nem sikerült betölteni.
           </p>
@@ -213,15 +213,7 @@ function SignedOut() {
   }
 
   return (
-    <section className="panel family-signin">
-      <span className="section-icon">
-        <Icon name="family" />
-      </span>
-      <h2>Együtt könnyebb figyelni.</h2>
-      <p>
-        Mentsd a fiókodat, hogy létrehozhass egy családot, vagy csatlakozhass a
-        szeretteidhez.
-      </p>
+    <section className="family-simple family-signin">
       <button
         type="button"
         onClick={save}
@@ -237,9 +229,8 @@ function SignedOut() {
         )}
         {busy ? "Kapcsolódás…" : "Fiók mentése Google-lal"}
       </button>
-      <p className="privacy-note">
-        <Icon name="lock" />A családod csak a szervezet nevét és az időpontot
-        látja. Az üzeneted tartalmát nem.
+      <p className="family-note">
+        A család csak a szervezet nevét és az időpontot látja, az üzenetet nem.
       </p>
       {failed && (
         <p role="alert" className="font-bold">
@@ -295,14 +286,8 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
 
   return (
     <div className="stack family-setup">
-      <section className="panel stack">
-        <span className="section-icon">
-          <Icon name="family" />
-        </span>
-        <h2>Én figyelek valakire</h2>
-        <p>
-          Hozz létre egy családot, és add át a kapott kódot a családtagodnak.
-        </p>
+      <section className="family-simple family-section stack">
+        <h2>Család létrehozása</h2>
         <button
           type="button"
           onClick={create}
@@ -317,10 +302,10 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
           </p>
         )}
       </section>
-      <form onSubmit={join} className="panel stack">
-        <h2 className="text-xl font-bold">Csatlakozás családhoz</h2>
-        <label htmlFor="family-code" className="text-lg">
-          Írd be a 6 karakteres családkódot:
+      <form onSubmit={join} className="family-simple family-section stack">
+        <h2>Csatlakozás</h2>
+        <label htmlFor="family-code" className="sr-only">
+          Hat karakteres családkód
         </label>
         <input
           id="family-code"
@@ -333,7 +318,7 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
           spellCheck={false}
           maxLength={12}
           className="family-input"
-          placeholder="ABC123"
+          placeholder="Családkód"
         />
         <button
           type="submit"
@@ -402,18 +387,12 @@ function History({
   failed: boolean;
 }) {
   return (
-    <section className="panel stack family-panel">
-      <h2>Korábbi riasztások</h2>
+    <section className="family-simple family-section stack family-panel">
+      <h2>Riasztások</h2>
       {failed && <p>Az előzményeket most nem sikerült betölteni.</p>}
       {!failed && alerts === null && <p>Betöltés…</p>}
       {alerts && alerts.length === 0 && (
-        <div className="history-empty">
-          <Icon name="bell" />
-          <p>Még nem érkezett piros riasztás.</p>
-          <p className="text-xs mt-1">
-            Itt látod majd a családodhoz tartozó jelzéseket.
-          </p>
-        </div>
+        <p className="family-note">Még nincs riasztás.</p>
       )}
       {alerts && alerts.length > 0 && (
         <ul className="flex flex-col gap-3">
@@ -581,45 +560,39 @@ function OwnerPanel({ familyId, code }: { familyId: string; code: string }) {
         </div>
       )}
 
-      <div className="panel stack family-panel">
-        <h2>A családod meghívókódja</h2>
-        <p className="text-sm text-[var(--muted)]">
-          Add meg ezt a kódot a nagyi telefonján a Családi védőháló oldalon:
-        </p>
+      <div className="family-simple family-section stack family-panel">
+        <h2>Családkód</h2>
         <p
           className="family-code"
           aria-label={`Családkód: ${code.split("").join(" ")}`}
         >
           {code}
         </p>
+        <p className="family-note">Ezt add át annak, aki csatlakozik.</p>
         {members !== null && (
-          <p>
-            {members === 0
-              ? "Még senki nem csatlakozott."
-              : `Csatlakozott családtagok száma: ${members}`}
+          <p className="family-note">
+            {members === 0 ? "Még senki nem csatlakozott." : `${members} családtag csatlakozott.`}
           </p>
         )}
       </div>
 
-      <div className="panel stack family-panel">
+      <div className="family-simple family-section stack family-panel">
         <h2>Értesítések</h2>
-        <p className="text-sm text-[var(--muted)]">
-          Azonnal csak akkor szól, ha ez az oldal nyitva van.
-        </p>
+        <p className="family-note">Az élő jelzéshez tartsd nyitva ezt az oldalt.</p>
         {live === "on" && (
           <p className="status-line">
             <span className="status-dot" />
-            Élő figyelés: bekapcsolva.
+            Élő figyelés aktív
           </p>
         )}
         {live === "connecting" && (
           <p className="status-line">
             <span className="spinner" aria-hidden="true" />
-            Kapcsolódás az élő figyeléshez…
+            Kapcsolódás…
           </p>
         )}
         {live === "off" && (
-          <p>Az élő figyelés most nem kapcsolódik. Töltsd újra az oldalt.</p>
+          <p>Az élő figyelés megszakadt. Töltsd újra az oldalt.</p>
         )}
         {permission === "default" && (
           <button
@@ -630,7 +603,7 @@ function OwnerPanel({ familyId, code }: { familyId: string; code: string }) {
             Értesítések engedélyezése
           </button>
         )}
-        {permission === "granted" && <p>Értesítések: engedélyezve.</p>}
+        {permission === "granted" && <p className="family-note">Böngészőértesítések bekapcsolva.</p>}
         {permission === "denied" && (
           <p>
             Az értesítések le vannak tiltva. A böngésző beállításaiban
@@ -648,10 +621,8 @@ function MemberPanel({ familyId }: { familyId: string }) {
   const { alerts, failed } = useAlerts(familyId);
   return (
     <section className="flex flex-col gap-6">
-      <p className="panel text-base">
-        Csatlakoztál a családhoz. Ha egy ellenőrzés PIROS ítéletet ad, a
-        családod értesítést kap. Csak a szervezet nevét és az időpontot látják,
-        az üzenetet nem.
+      <p className="family-note">
+        Csatlakoztál. Piros eredménynél a család a szervezet nevét és az időpontot látja.
       </p>
       <History alerts={alerts} failed={failed} />
     </section>
