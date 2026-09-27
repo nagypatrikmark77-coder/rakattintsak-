@@ -19,6 +19,20 @@ self.addEventListener("fetch", (event) => {
   }
 });
 
+// Családi riasztás értesítésére koppintva a /csalad oldal nyílik meg (vagy kerül előtérbe).
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  event.waitUntil(
+    (async () => {
+      const target = new URL("/csalad", self.location.origin).href;
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      const open = windows.find((w) => w.url === target);
+      if (open) return open.focus();
+      return self.clients.openWindow(target);
+    })(),
+  );
+});
+
 async function handleShare(request) {
   try {
     const form = await request.formData();

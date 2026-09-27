@@ -14,7 +14,7 @@ Egy sor = egy döntés. A jóváhagyott tervből (2026-09-27) és a végrehajtá
 
 ## Végrehajtás közben
 - M1: a share-target szerveroldali fallbackje (ha nincs aktív service worker) nem olvassa a kérés törzsét, csak 303-mal a /?shared=failed oldalra irányít.
-- M1: a megosztott tartalom a Cache API-ban (rakattintsak-share-v1) vár, a főoldal kiolvasás után azonnal törli.
+- M1→M3: a megosztott tartalom a Cache API-ban (rakattintsak-share-v1) vár; a főoldal előbb csak kiolvassa, és csak sikeres ellenőrzés után törli (hiba, limit vagy hiányzó session esetén megmarad az újrapróbáláshoz).
 - M1: Android a linket gyakran a text mezőben küldi; a főoldal a title/text/url mezőket ismétlődés nélkül fűzi össze.
 - M1: ikon = generált fekete „?” fehér alapon (scripts/icons.mjs), nincs logó.
 - M1: @types/node ^24 (a Vercel alapértelmezett Node 24.x, és a vitest 5 ezt kéri).
@@ -44,3 +44,15 @@ Egy sor = egy döntés. A jóváhagyott tervből (2026-09-27) és a végrehajtá
 - A path_restricted szabály a látható (a szervezet által küldött) linkre vonatkozik; redirect után a végcélnak elég a szervezet hivatalos domainjén maradnia. Ok: az éles mérés kimutatta, hogy a valódi posta.hu/szolgaltatasok/vam 301-gyel a net.posta.hu/dashboard/public/dashboard-ui/vam/ oldalra visz, így a korábbi metszet-logika a valódi vámdíj-SMS-t PIROS-ra tette.
 - Hasonmás-finomítás (általános szabály): 4–5 betűs márkatoken csak domainrész elején számít (sneakers.hu ≠ NEAK, bonusz.hu ≠ NÚSZ); a közös állami domain aldomain-címkéje (tarhely.gov.hu, neak.gov.hu) nem márkatoken és nem Levenshtein-alap (tarhely.eu, peak.com nem hasonmás).
 - Regex-tartalék: az „átutal” tő helyett csak felszólító/főnévi igenévi alakok (a „átutalás érkezett” valódi banki értesítés ne legyen pénzkérés); az „új szám” helyett konkrét alakok („új számla” ≠ új telefonszám); a zárolás ragozott tövei (zárol, felfüggeszt, kikapcsol, letilt) is fenyegetésnek számítanak.
+
+## M4–M6: család, limitek, auth (2026-09-27)
+- Supabase-projekt: „rakattintsak-” (usrplrvqukilhuvelgjb, eu-west-1), Patrik hozta létre. A `SUPABASE_URL` az .env.local-ban Postgres connection string, ezért az API URL-t az anon kulcs ref-jéből származtatjuk (next.config env); a Vercelen a brief szerinti NEXT_PUBLIC_* nevek vannak.
+- Az M5/M6 kiegészítés felülírja az eredeti brief „fiók nélkül, localStorage family_id, alerts anon select” részét: minden felhasználó (anonim is) Supabase-sessiont kap; az alerts csak a család tagjainak olvasható (RLS), anonnak nem.
+- Tagság külön táblában (family_members: owner = unoka, member = nagyi); families.owner_id a user_id-hoz kötve. Riasztás csak a „member” PIROS ellenőrzéséből születik; az unoka saját ellenőrzése nem riaszt.
+- A riasztás családját a szerver a bejelentkezett user tagságából határozza meg, a kliens nem küld family_id-t.
+- „Előzmények” = a család riasztásainak listája (márka + időpont). Ellenőrzés-előzményt nem tárolunk, mert tartalmat nem tárolhatunk.
+- Limit: `hit_limits` SQL-függvény, egy tranzakcióban nézi a 20/óra/IP és a 30/nap/felhasználó limitet (Europe/Budapest nap); elutasított kérés nem számít bele. Supabase-hiba esetén az ellenőrzés engedett (fail-open), a költséget az Anthropic keret védi.
+- IP-hash: sha256(RATE_LIMIT_SALT | ip); a rate_limits sorok 2 óra után törlődnek.
+- A tagság-ellenőrző (is_family_member) a nem publikált `private` sémában van, hogy RPC-n ne legyen hívható. A Supabase saját `public.rls_auto_enable()` függvényéhez nem nyúltunk (a tanácsadó jelzi, projekt-alapértelmezés).
+- `npm run test:db`: adatbázis-kapu ideiglenes tesztfelhasználókkal (limitek, riasztás, oszlopok, RLS), a végén törli őket; elrontott limittel (--day-limit=1000) bizonyítottan elbukik.
+- M6 Google: „Fiók mentése Google-lal” = linkIdentity az anonim userhez (a user_id és a usage megmarad). Ha a Google-fiók már másik felhasználóhoz tartozik (identity_already_exists), „Belépés ezzel a Google-fiókkal” = signInWithOAuth (az eszköz anonim adatai ilyenkor nem kerülnek át).

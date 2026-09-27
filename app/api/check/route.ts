@@ -1,8 +1,11 @@
 // POST /api/check — { text?: string, image?: base64 | data URL }
 // A beküldött tartalom csak memóriában él; nem mentjük és nem naplózzuk.
 import { extractWithClaude } from "@/lib/extract";
+import { ENTITIES } from "@/lib/kb";
+import { clientIp, hitLimits, ipHash, LIMIT_MESSAGES } from "@/lib/limits";
 import { logError } from "@/lib/log";
 import { runCheck, type CheckInput, type ImageMediaType } from "@/lib/pipeline";
+import { adminClient, userFromRequest } from "@/lib/supabase/server";
 
 export const maxDuration = 60;
 
@@ -51,17 +54,32 @@ export async function POST(request: Request) {
     input.imageMediaType = image.mediaType;
   }
 
+  // Limit: 20/óra/IP és 30/nap/felhasználó (anonim session is felhasználó). Adatbázis-hiba esetén engedjük.
+  const admin = adminClient();
+  const user = admin ? await userFromRequest(request, admin) : null;
+  if (admin) {
+    const limit = await hitLimits(admin, user?.id ?? null, ipHash(clientIp(request)));
+    if (limit === "ip_hour" || limit === "user_day") return error(429, LIMIT_MESSAGES[limit]);
+    if (limit === "unavailable") logError("limits_unavailable");
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     logError("no_api_key");
     return error(503, "Az ellenőrzés most nem elérhető. Próbáld újra később.");
   }
 
   try {
-    const { response } = await runCheck(input, {
+    const { response, signals } = await runCheck(input, {
       extract: (i) => extractWithClaude(i),
       followRedirects: true,
       compareUrls: true,
     });
+    // PIROS ítéletnél: red_count++ és riasztás a családnak. Csak a márka neve megy, tartalom soha.
+    if (response.verdict === "red" && admin && user) {
+      const brand = ENTITIES.find((e) => e.id === signals.claimed_sender)?.name ?? "ismeretlen";
+      const { error: rpcError } = await admin.rpc("record_red", { p_user_id: user.id, p_brand: brand });
+      if (rpcError) logError("record_red_failed");
+    }
     return Response.json(response, { headers: { "Cache-Control": "no-store" } });
   } catch (err) {
     logError("check_failed", err);
