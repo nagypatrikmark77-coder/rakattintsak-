@@ -4,12 +4,16 @@
 import { useEffect, useRef, useState } from "react";
 import { bankContacts, selectSteps, telHref } from "@/lib/damage";
 import { DAMAGE, ENTITIES } from "@/lib/kb";
+import { Icon } from "../ui";
 
 const QUESTIONS = DAMAGE.questions;
 const BANK_CONTACTS = bankContacts(ENTITIES);
 
 export default function DamageFlow() {
-  const [{ answers, index }, setFlow] = useState<{ answers: Record<string, boolean>; index: number }>({
+  const [{ answers, index }, setFlow] = useState<{
+    answers: Record<string, boolean>;
+    index: number;
+  }>({
     answers: {},
     index: 0,
   });
@@ -27,7 +31,10 @@ export default function DamageFlow() {
     setFlow((prev) => {
       if (prev.index >= QUESTIONS.length) return prev;
       const q = QUESTIONS[prev.index];
-      return { answers: { ...prev.answers, [q.id]: value }, index: prev.index + 1 };
+      return {
+        answers: { ...prev.answers, [q.id]: value },
+        index: prev.index + 1,
+      };
     });
   }
 
@@ -44,37 +51,61 @@ export default function DamageFlow() {
   if (index < QUESTIONS.length) {
     const q = QUESTIONS[index];
     return (
-      <section className="flex flex-col gap-4">
-        <h2 ref={headingRef} tabIndex={-1} className="flex flex-col gap-2 focus:outline-none">
-          <span className="text-base font-normal">
-            <span aria-hidden="true">
-              {index + 1} / {QUESTIONS.length}
-            </span>
-            <span className="sr-only">
-              {index + 1}. kérdés, összesen {QUESTIONS.length}.
-            </span>
+      <section className="panel question-card">
+        <div className="flow-progress">
+          <span>Néhány kérdés, hogy segíthessünk</span>
+          <span aria-hidden="true">
+            {index + 1} / {QUESTIONS.length}
           </span>
-          <span className="text-2xl font-bold">{q.text}</span>
+        </div>
+        <div className="progress-track" aria-hidden="true">
+          {QUESTIONS.map((question, i) => (
+            <span
+              key={question.id}
+              className={`progress-segment ${i <= index ? "complete" : ""}`}
+            />
+          ))}
+        </div>
+        <span className="section-icon">
+          <Icon name="help" />
+        </span>
+        <h2
+          ref={headingRef}
+          tabIndex={-1}
+          className="question-heading focus:outline-none"
+        >
+          <span className="sr-only">
+            {index + 1}. kérdés, összesen {QUESTIONS.length}.{" "}
+          </span>
+          {q.text}
         </h2>
-        <button
-          type="button"
-          onClick={() => answer(true)}
-          className="min-h-[56px] w-full bg-black px-4 text-lg font-bold text-white"
-        >
-          Igen
-        </button>
-        <button
-          type="button"
-          onClick={() => answer(false)}
-          className="min-h-[56px] w-full border-2 border-black bg-white px-4 text-lg font-bold text-black"
-        >
-          Nem
-        </button>
+        <div className="answer-options">
+          <button
+            type="button"
+            onClick={() => answer(true)}
+            className="button button-primary"
+          >
+            <Icon name="check" />
+            Igen
+          </button>
+          <button
+            type="button"
+            onClick={() => answer(false)}
+            className="button button-secondary"
+          >
+            <Icon name="close" />
+            Nem
+          </button>
+        </div>
         {index > 0 && (
-          <button type="button" onClick={back} className="min-h-[56px] self-start text-base underline">
+          <button type="button" onClick={back} className="text-button">
+            <Icon name="back" />
             Vissza
           </button>
         )}
+        <p className="question-note">
+          <Icon name="lock" />A válaszaid csak ezen az oldalon maradnak.
+        </p>
       </section>
     );
   }
@@ -82,14 +113,18 @@ export default function DamageFlow() {
   const steps = selectSteps(answers, DAMAGE);
 
   return (
-    <section className="flex flex-col gap-4">
-      <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-bold focus:outline-none">
+    <section className="stack">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="text-2xl font-semibold focus:outline-none"
+      >
         Mit tegyél most
       </h2>
-      <ol className="flex flex-col gap-4">
+      <ol className="action-list">
         {steps.map(({ id, step }) => (
-          <li key={id} className="flex flex-col gap-3 border-2 border-black p-4">
-            <h3 className="text-xl font-bold">{step.title}</h3>
+          <li key={id} className="panel action-card">
+            <h3>{step.title}</h3>
             <ul className="flex list-disc flex-col gap-2 pl-6">
               {step.items.map((item) => (
                 <li key={item}>{item}</li>
@@ -97,11 +132,13 @@ export default function DamageFlow() {
             </ul>
             {id === "bank_urgent" && BANK_CONTACTS.length > 0 && (
               <div className="flex flex-col gap-1">
-                <p className="font-bold">Ellenőrzött bankok kártyaletiltó számai:</p>
+                <p className="font-bold">
+                  Ellenőrzött bankok kártyaletiltó számai:
+                </p>
                 <ul className="flex flex-col">
                   {BANK_CONTACTS.map((c) => (
                     <li key={`${c.name}-${c.number}`}>
-                      <a href={telHref(c.number)} className="flex min-h-[56px] items-center underline">
+                      <a href={telHref(c.number)} className="text-link">
                         {c.name} – {c.label}: {c.number}
                       </a>
                     </li>
@@ -117,7 +154,7 @@ export default function DamageFlow() {
                       href={l.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex min-h-[56px] items-center underline"
+                      className="text-link"
                     >
                       {l.label}
                       <span className="sr-only"> (új lapon nyílik meg)</span>
@@ -132,7 +169,7 @@ export default function DamageFlow() {
       <button
         type="button"
         onClick={restart}
-        className="min-h-[56px] w-full border-2 border-black bg-white px-4 text-lg font-bold text-black"
+        className="button button-secondary button-wide"
       >
         Újrakezdés
       </button>

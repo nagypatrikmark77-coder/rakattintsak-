@@ -1,13 +1,14 @@
-// Egyszerű generált ikonok: fekete „?” fehér alapon. Nincs logó.
+// Az alkalmazás pajzs-kérdőjel jelének PWA-változatai.
 import sharp from "sharp";
 import { mkdir } from "node:fs/promises";
 
 const svg = (size, padding) => `
 <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">
-  <rect width="100%" height="100%" fill="#ffffff"/>
-  <text x="50%" y="50%" dy="0.35em" text-anchor="middle"
-        font-family="Helvetica, Arial, sans-serif" font-weight="700"
-        font-size="${Math.round((size - 2 * padding) * 0.8)}" fill="#000000">?</text>
+  <rect width="100%" height="100%" fill="#e5efb4"/>
+  <g transform="translate(${padding} ${padding}) scale(${(size - 2 * padding) / 24})" fill="none" stroke="#284f3c" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3 4.5 6v5c0 4.5 3 7.5 7.5 10 4.5-2.5 7.5-5.5 7.5-10V6L12 3Z"/>
+    <path d="M9.5 10a2.5 2.5 0 0 1 5 0c0 1.5-2.5 1.5-2.5 3M12 16h.01"/>
+  </g>
 </svg>`;
 
 await mkdir("public/icons", { recursive: true });

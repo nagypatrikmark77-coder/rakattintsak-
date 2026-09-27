@@ -6,12 +6,13 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { CheckResponse, Verdict } from "@/lib/types";
 import { ReadAloudButton, readNagyiMode, saveNagyiMode } from "./nagyi";
+import { Icon } from "./ui";
 
-// Szín csak az ítéletnél van.
+// Az ítéletet szín és szöveges címke együtt jelzi.
 const VERDICT_CLASS: Record<Verdict, string> = {
-  red: "bg-red-700 text-white",
-  yellow: "bg-yellow-300 text-black",
-  gray: "bg-gray-200 text-black",
+  red: "verdict-red",
+  yellow: "verdict-yellow",
+  gray: "verdict-gray",
 };
 
 export default function ResultView({ result }: { result: CheckResponse }) {
@@ -35,23 +36,39 @@ export default function ResultView({ result }: { result: CheckResponse }) {
   const card = result.brand_card;
 
   return (
-    <section ref={sectionRef} aria-label="Az ellenőrzés eredménye" className="flex flex-col gap-6">
-      <button
-        type="button"
-        aria-pressed={nagyi}
-        onClick={toggleNagyi}
-        className={`min-h-[56px] self-start border-2 border-black px-4 text-lg font-bold ${
-          nagyi ? "bg-black text-white" : "bg-white text-black"
-        }`}
-      >
-        Nagyi mód<span aria-hidden="true">: {nagyi ? "be" : "ki"}</span>
-      </button>
-
-      <div className={`p-4 ${VERDICT_CLASS[result.verdict]}`}>
+    <section
+      ref={sectionRef}
+      aria-label="Az ellenőrzés eredménye"
+      className="panel stack result-section"
+    >
+      <div className="result-toolbar">
+        <p>Az ellenőrzés eredménye</p>
+        <button
+          type="button"
+          aria-pressed={nagyi}
+          onClick={toggleNagyi}
+          className="mode-button"
+        >
+          Nagyi mód
+          <span className="mode-toggle" aria-hidden="true" />
+          <span className="sr-only">
+            {nagyi ? "bekapcsolva" : "kikapcsolva"}
+          </span>
+        </button>
+      </div>
+      <div className={`verdict-card ${VERDICT_CLASS[result.verdict]}`}>
+        <p className="verdict-label">
+          <Icon name={result.verdict === "gray" ? "help" : "alert"} />
+          {result.verdict === "red"
+            ? "PIROS · FIGYELMEZTETÉS"
+            : result.verdict === "yellow"
+              ? "SÁRGA · ÓVATOSSÁG"
+              : "SZÜRKE · NINCS EGYÉRTELMŰ JEL"}
+        </p>
         <h2
           ref={headingRef}
           tabIndex={-1}
-          className={`font-bold focus:outline-none ${nagyi ? "text-[2.25rem] leading-tight" : "text-3xl leading-tight"}`}
+          className={`focus:outline-none ${nagyi ? "nagyi-heading" : ""}`}
         >
           {result.headline}
         </h2>
@@ -62,14 +79,14 @@ export default function ResultView({ result }: { result: CheckResponse }) {
       ) : (
         <>
           {result.reasons.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xl font-bold">Amit találtunk</h3>
+            <div className="result-block">
+              <h3>Amit találtunk</h3>
               <ul className="flex flex-col gap-4">
                 {result.reasons.map((reason, i) => (
                   <li key={i} className="flex flex-col gap-1">
                     <p>{reason.text}</p>
                     {reason.evidence.trim() && (
-                      <p className="border-l-4 border-black pl-3 wrap-anywhere">„{reason.evidence.trim()}”</p>
+                      <p className="evidence">„{reason.evidence.trim()}”</p>
                     )}
                   </li>
                 ))}
@@ -78,8 +95,8 @@ export default function ResultView({ result }: { result: CheckResponse }) {
           )}
 
           {result.actions.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xl font-bold">Mit tegyél most?</h3>
+            <div className="result-block">
+              <h3>Mit tegyél most?</h3>
               <ol className="list-decimal space-y-2 pl-6">
                 {result.actions.map((action, i) => (
                   <li key={i}>{action}</li>
@@ -89,7 +106,7 @@ export default function ResultView({ result }: { result: CheckResponse }) {
           )}
 
           {card && (
-            <div className="flex flex-col gap-3 border-2 border-black p-4">
+            <div className="domain-card">
               <dl className="flex flex-col gap-2">
                 <div>
                   <dt className="font-bold">Kinek adja ki magát:</dt>
@@ -97,13 +114,16 @@ export default function ResultView({ result }: { result: CheckResponse }) {
                 </div>
                 <div>
                   <dt className="font-bold">A linkben szereplő cím:</dt>
-                  <dd className="wrap-anywhere">{card.examined_domain || "nincs link az üzenetben"}</dd>
+                  <dd className="wrap-anywhere">
+                    {card.examined_domain || "nincs link az üzenetben"}
+                  </dd>
                 </div>
                 <div>
                   <dt className="font-bold">A hivatalos cím:</dt>
                   <dd className="wrap-anywhere">
                     {card.official_domain}
-                    {!card.verified && " (a hivatalos adatokat még nem ellenőriztük)"}
+                    {!card.verified &&
+                      " (a hivatalos adatokat még nem ellenőriztük)"}
                   </dd>
                 </div>
                 {card.examined_domain && (
@@ -118,7 +138,7 @@ export default function ResultView({ result }: { result: CheckResponse }) {
                   href={card.official_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-[56px] items-center underline"
+                  className="text-link mt-3"
                 >
                   A szervezet hivatalos oldala
                 </a>
@@ -127,8 +147,8 @@ export default function ResultView({ result }: { result: CheckResponse }) {
           )}
 
           {result.checked.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xl font-bold">Mit néztünk meg</h3>
+            <div className="result-block">
+              <h3>Mit néztünk meg</h3>
               <ul className="list-disc space-y-2 pl-6">
                 {result.checked.map((item, i) => (
                   <li key={i}>{item}</li>
@@ -138,8 +158,8 @@ export default function ResultView({ result }: { result: CheckResponse }) {
           )}
 
           {result.not_checked.length > 0 && (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-xl font-bold">Mit nem tudtunk megnézni</h3>
+            <div className="result-block">
+              <h3>Mit nem tudtunk megnézni</h3>
               <ul className="list-disc space-y-2 pl-6">
                 {result.not_checked.map((item, i) => (
                   <li key={i} className="wrap-anywhere">
@@ -150,8 +170,11 @@ export default function ResultView({ result }: { result: CheckResponse }) {
             </div>
           )}
 
-          <Link href="/rakattintottam" className="flex min-h-[56px] items-center text-lg underline">
-            Már rákattintottam
+          <Link
+            href="/rakattintottam"
+            className="button button-secondary button-wide"
+          >
+            Már rákattintottam <Icon name="arrow" />
           </Link>
         </>
       )}

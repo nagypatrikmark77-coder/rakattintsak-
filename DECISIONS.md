@@ -2,6 +2,11 @@
 
 Egy sor = egy döntés. A jóváhagyott tervből (2026-09-27) és a végrehajtás közbeni apró döntésekből.
 
+## Teljes felület megújítása (2026-09-27)
+- A korábbi 480 px-es elrendezést világos, zsályazöld alkalmazásfelület váltja: asztali oldalsáv, mobilon közvetlenül elérhető menüsor; a három fő funkció külön menüpont, a használati segítség a `/utmutato` oldalon érhető el. Promóciós banner nincs.
+- Az űrlapok, az eredmények mindhárom ítéletszíne, a Nagyi mód, a családi nézetek és a hatkérdéses segítség egységes kártyákat, gombokat, fókuszjelzéseket és visszajelzéseket kapott. A kérdőjeles pajzs a böngészőikonon és a PWA-ikonokon is megjelenik.
+- A design munka a megjelenítést érinti; az API, a kiértékelés, a tagság- és hitelesítéskezelés, a megosztás, az adatbázis és az értesítések folyamata változatlan. A böngészős QA szimulált API- és családi válaszokkal futott; az éles AI, Google-belépés és értesítéskézbesítés működését nem bizonyítja.
+
 ## A jóváhagyott tervből
 - Küszöb: 0–24 SZÜRKE, 25–39 SÁRGA, 40+ PIROS (Patrik döntése).
 - Hasonmás domain: ≤3 betűs márkanév csak önálló domain-címkeként (pont/kötőjel határolva) számít, 4+ betűs részszóként is; Levenshtein ≤2 csak 7+ karakteres címkére, ≤1 4–6 karakteresre, 3 alatt nincs (Patrik döntése).

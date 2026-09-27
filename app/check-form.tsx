@@ -3,19 +3,35 @@
 // A főoldal űrlapja: szöveg vagy kép beküldése a /api/check végpontra, az eredmény ugyanitt, az űrlap alatt.
 // A beküldött tartalom csak az oldal memóriájában él. Megosztásnál a Cache API-ban váró tartalmat
 // csak sikeres ellenőrzés után töröljük, hogy hiba esetén újra lehessen próbálni.
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+  type FormEvent,
+} from "react";
 import { resizeImage } from "@/lib/image-resize";
-import { clearSharedPayload, combineSharedText, peekSharedPayload } from "@/lib/shared-inbox";
+import {
+  clearSharedPayload,
+  combineSharedText,
+  peekSharedPayload,
+} from "@/lib/shared-inbox";
 import { ensureSession, authHeader } from "@/lib/supabase/browser";
 import type { CheckResponse } from "@/lib/types";
 import ResultView from "./result-view";
+import { Icon } from "./ui";
 
-const MSG_EMPTY = "Másolj be egy üzenetet vagy linket, vagy tölts fel egy képet.";
-const MSG_NETWORK = "Nem sikerült elérni a szervert. Ellenőrizd az internetkapcsolatot, és próbáld újra.";
+const MSG_EMPTY =
+  "Másolj be egy üzenetet vagy linket, vagy tölts fel egy képet.";
+const MSG_NETWORK =
+  "Nem sikerült elérni a szervert. Ellenőrizd az internetkapcsolatot, és próbáld újra.";
 const MSG_FAILED = "Az ellenőrzés most nem sikerült. Próbáld újra később.";
-const MSG_IMAGE_FORMAT = "Ezt a képformátumot nem tudom megnyitni. Készíts képernyőképet, és azt töltsd fel.";
-const MSG_SHARE_FAILED = "A megosztás nem sikerült. Nyisd meg újra az alkalmazást, és próbáld még egyszer.";
+const MSG_IMAGE_FORMAT =
+  "Ezt a képformátumot nem tudom megnyitni. Készíts képernyőképet, és azt töltsd fel.";
+const MSG_SHARE_FAILED =
+  "A megosztás nem sikerült. Nyisd meg újra az alkalmazást, és próbáld még egyszer.";
 const MSG_SHARE_EMPTY = "Nem találtam megosztott tartalmat.";
 const MSG_SHARE_UNREADABLE = "Nem sikerült beolvasni a megosztott tartalmat.";
 
@@ -85,7 +101,9 @@ async function postCheck(text: string, image: string | null): Promise<Outcome> {
   }
   if (res.ok && isCheckResponse(body)) return { result: body };
   const serverMessage =
-    body && typeof body === "object" && typeof (body as { error?: unknown }).error === "string"
+    body &&
+    typeof body === "object" &&
+    typeof (body as { error?: unknown }).error === "string"
       ? (body as { error: string }).error
       : null;
   // Újrapróbálás: szerverhiba, limit, vagy értelmezhetetlen válasz. A 400/413 a bemeneten múlik.
@@ -102,30 +120,35 @@ export default function CheckForm() {
   const [result, setResult] = useState<CheckResponse | null>(null);
   const [error, setError] = useState<CheckError | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [draggingImage, setDraggingImage] = useState(false);
   const inFlight = useRef(false);
   const shareHandled = useRef(false);
+  const fileInput = useRef<HTMLInputElement>(null);
 
-  const runCheck = useCallback(async (checkText: string, checkImage: string | null) => {
-    if (inFlight.current) return;
-    if (!checkText.trim() && !checkImage) {
+  const runCheck = useCallback(
+    async (checkText: string, checkImage: string | null) => {
+      if (inFlight.current) return;
+      if (!checkText.trim() && !checkImage) {
+        setResult(null);
+        setError({ message: MSG_EMPTY, canRetry: false });
+        return;
+      }
+      inFlight.current = true;
+      setLoading(true);
       setResult(null);
-      setError({ message: MSG_EMPTY, canRetry: false });
-      return;
-    }
-    inFlight.current = true;
-    setLoading(true);
-    setResult(null);
-    setError(null);
-    setNotice(null);
-    const outcome = await postCheck(checkText, checkImage);
-    // Az eredmény és a töltés vége egy renderben: így az odagörgetés után nem ugrik el a tartalom.
-    if ("result" in outcome) setResult(outcome.result);
-    else setError(outcome.error);
-    setLoading(false);
-    inFlight.current = false;
-    // Sikeres ellenőrzés után a megosztásból várakozó tartalom sem maradhat a készüléken.
-    if ("result" in outcome) await clearSharedPayload().catch(() => {});
-  }, []);
+      setError(null);
+      setNotice(null);
+      const outcome = await postCheck(checkText, checkImage);
+      // Az eredmény és a töltés vége egy renderben: így az odagörgetés után nem ugrik el a tartalom.
+      if ("result" in outcome) setResult(outcome.result);
+      else setError(outcome.error);
+      setLoading(false);
+      inFlight.current = false;
+      // Sikeres ellenőrzés után a megosztásból várakozó tartalom sem maradhat a készüléken.
+      if ("result" in outcome) await clearSharedPayload().catch(() => {});
+    },
+    [],
+  );
 
   // Megosztás menüből érkezés: /?shared=1 (a service worker a Cache API-ba tette a tartalmat) vagy /?shared=failed.
   useEffect(() => {
@@ -174,11 +197,7 @@ export default function CheckForm() {
     })();
   }, [runCheck]);
 
-  async function onImageChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0] ?? null;
-    // Ugyanaz a fájl újra kiválasztható legyen.
-    e.target.value = "";
-    if (!file) return;
+  async function prepareImage(file: File) {
     setImageError(null);
     setPreparingImage(true);
     try {
@@ -189,6 +208,28 @@ export default function CheckForm() {
     } finally {
       setPreparingImage(false);
     }
+  }
+
+  function onImageChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0] ?? null;
+    // Ugyanaz a fájl újra kiválasztható legyen.
+    e.target.value = "";
+    if (file) void prepareImage(file);
+  }
+
+  function onDragOver(e: DragEvent<HTMLDivElement>) {
+    if (busy || !Array.from(e.dataTransfer.types).includes("Files")) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setDraggingImage(true);
+  }
+
+  function onDrop(e: DragEvent<HTMLDivElement>) {
+    setDraggingImage(false);
+    if (busy || !Array.from(e.dataTransfer.types).includes("Files")) return;
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) void prepareImage(file);
   }
 
   function removeImage() {
@@ -204,89 +245,126 @@ export default function CheckForm() {
   const busy = loading || preparingImage;
 
   return (
-    <div className="flex flex-col gap-6">
-      {notice && <p className="border-2 border-black p-3">{notice}</p>}
-
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-2">
-          <span>Másold ide az üzenetet vagy a linket</span>
+    <div className="stack">
+      {notice && (
+        <p role="status" className="notice">
+          <Icon name="help" />
+          {notice}
+        </p>
+      )}
+      <form
+        onSubmit={onSubmit}
+        className="panel check-panel"
+        aria-label="Üzenet ellenőrzése"
+        aria-busy={busy}
+      >
+        <div className="panel-heading">
+          <span className="section-icon">
+            <Icon name="message" />
+          </span>
+          <div>
+            <h2>Mit szeretnél ellenőrizni?</h2>
+            <p>SMS, e-mail, link vagy képernyőkép</p>
+          </div>
+        </div>
+        <div
+          className={`check-composer${draggingImage ? " is-dragging" : ""}`}
+          onDragOver={onDragOver}
+          onDragLeave={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node)) setDraggingImage(false);
+          }}
+          onDrop={onDrop}
+        >
+          <label htmlFor="check-message" className="sr-only">
+            Másold ide az üzenetet vagy a linket
+          </label>
           <textarea
+            id="check-message"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            rows={6}
-            className="w-full border-2 border-black p-3 text-lg"
+            rows={3}
+            className="check-textarea"
+            placeholder="Írd vagy másold be az üzenetet vagy a linket…"
           />
-        </label>
-
-        <label className="flex min-h-[56px] cursor-pointer items-center justify-center border-2 border-black px-4 text-lg">
-          {preparingImage ? "Kép betöltése…" : image ? "Másik kép választása" : "Kép feltöltése"}
-          <input type="file" accept="image/*" className="sr-only" onChange={onImageChange} disabled={busy} />
-        </label>
-
-        {imageError && (
-          <p role="alert" className="border-2 border-black p-3">
-            {imageError}
-          </p>
-        )}
-
-        {image && (
-          <div className="flex flex-col gap-2">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={image.dataUrl}
-              alt="A kiválasztott kép"
-              className="max-h-80 w-full border border-black object-contain"
+          {image && (
+            <div className="image-preview">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={image.dataUrl} alt="A kiválasztott kép" />
+              <button
+                type="button"
+                onClick={removeImage}
+                disabled={loading}
+                className="image-remove"
+                aria-label="Kép eltávolítása"
+                title="Kép eltávolítása"
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+          )}
+          <div className="composer-actions">
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={onImageChange}
+              disabled={busy}
+              tabIndex={-1}
             />
             <button
               type="button"
-              onClick={removeImage}
-              disabled={loading}
-              className="min-h-[56px] self-start text-base underline"
+              className="composer-add"
+              onClick={() => fileInput.current?.click()}
+              disabled={busy}
+              aria-label="Kép csatolása"
+              title="Kép csatolása"
             >
-              Kép eltávolítása
+              <Icon name="plus" />
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="composer-send"
+              aria-label={loading ? "Ellenőrzés folyamatban" : "Üzenet küldése ellenőrzésre"}
+              title={loading ? "Ellenőrzöm…" : "Küldés"}
+            >
+              {loading ? <span className="spinner" aria-hidden="true" /> : <Icon name="send" />}
             </button>
           </div>
+        </div>
+        {imageError && (
+          <p role="alert" className="notice notice-error mt-4">
+            <Icon name="alert" />
+            {imageError}
+          </p>
         )}
-
-        <button
-          type="submit"
-          disabled={busy}
-          className="min-h-[56px] bg-black px-4 text-lg font-bold text-white"
-        >
-          {loading ? "Ellenőrzöm…" : "Ellenőrzöm"}
-        </button>
-
-        <p role="status" className={loading ? "" : "sr-only"}>
-          {loading ? "Néhány másodperc." : ""}
+        <p role="status" className={loading ? "loading-status" : "sr-only"}>
+          {loading ? "Az ellenőrzés folyamatban van. Néhány másodperc." : ""}
+        </p>
+        <p className="privacy-note">
+          <Icon name="lock" />A beküldött üzenetet és képet nem mentjük el.
         </p>
       </form>
-
       {error && (
-        <div role="alert" className="flex flex-col gap-3 border-2 border-black p-4">
-          <p>{error.message}</p>
-          {error.canRetry && (
-            <button
-              type="button"
-              onClick={() => void runCheck(text, image?.dataUrl ?? null)}
-              disabled={busy}
-              className="min-h-[56px] border-2 border-black bg-white px-4 text-lg font-bold text-black"
-            >
-              Újra
-            </button>
-          )}
+        <div role="alert" className="notice notice-error">
+          <Icon name="alert" />
+          <div>
+            <p>{error.message}</p>
+            {error.canRetry && (
+              <button
+                type="button"
+                onClick={() => void runCheck(text, image?.dataUrl ?? null)}
+                disabled={busy}
+                className="text-button"
+              >
+                Újrapróbálás <Icon name="arrow" />
+              </button>
+            )}
+          </div>
         </div>
       )}
-
       {result && <ResultView result={result} />}
-
-      <nav className="flex flex-col">
-        <Link href="/rakattintottam" className="flex min-h-[56px] items-center text-base underline">
-          Már rákattintottam
-        </Link>
-        <Link href="/csalad" className="flex min-h-[56px] items-center text-base underline">
-          Családi védőháló
-        </Link>
-      </nav>
     </div>
   );
 }

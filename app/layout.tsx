@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import SwRegister from "./sw-register";
+import AppShell from "./app-shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,14 +11,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#f6f7f4",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="hu">
       <body>
-        <div className="mx-auto w-full max-w-[480px] px-4 py-6">{children}</div>
+        <AppShell>{children}</AppShell>
         <SwRegister />
       </body>
     </html>

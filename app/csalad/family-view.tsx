@@ -4,6 +4,7 @@
 // Az unoka (owner) élőben kapja a riasztást, de csak amíg ez az oldal nyitva van; Web Push nincs.
 // A riasztásban csak a szervezet neve és az időpont van, az üzenet tartalma soha.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { Icon } from "../ui";
 import {
   authHeader,
   browserClient,
@@ -25,10 +26,9 @@ import {
   type Membership,
 } from "./family-data";
 
-const BUTTON = "min-h-[56px] w-full bg-black px-4 text-lg font-bold text-white disabled:opacity-60";
-const BUTTON_OUTLINE =
-  "min-h-[56px] w-full border-2 border-black bg-white px-4 text-lg font-bold text-black disabled:opacity-60";
-const TEXT_BUTTON = "min-h-[56px] self-start text-base underline";
+const BUTTON = "button button-primary button-wide";
+const BUTTON_OUTLINE = "button button-secondary button-wide";
+const TEXT_BUTTON = "text-button self-start";
 
 type View =
   | { kind: "loading" }
@@ -52,7 +52,10 @@ async function resolveView(): Promise<View> {
   return { kind: "ready", memberships: parseMemberships(data) };
 }
 
-async function postFamily(path: string, body: object): Promise<{ ok: true } | { ok: false; message: string }> {
+async function postFamily(
+  path: string,
+  body: object,
+): Promise<{ ok: true } | { ok: false; message: string }> {
   try {
     const res = await fetch(path, {
       method: "POST",
@@ -61,10 +64,23 @@ async function postFamily(path: string, body: object): Promise<{ ok: true } | { 
     });
     if (res.ok) return { ok: true };
     const data: unknown = await res.json().catch(() => null);
-    const message = data && typeof data === "object" ? (data as { error?: unknown }).error : undefined;
-    return { ok: false, message: typeof message === "string" ? message : "Most nem sikerült. Próbáld újra később." };
+    const message =
+      data && typeof data === "object"
+        ? (data as { error?: unknown }).error
+        : undefined;
+    return {
+      ok: false,
+      message:
+        typeof message === "string"
+          ? message
+          : "Most nem sikerült. Próbáld újra később.",
+    };
   } catch {
-    return { ok: false, message: "Nem sikerült elérni a szervert. Ellenőrizd az internetkapcsolatot, és próbáld újra." };
+    return {
+      ok: false,
+      message:
+        "Nem sikerült elérni a szervert. Ellenőrizd az internetkapcsolatot, és próbáld újra.",
+    };
   }
 }
 
@@ -78,7 +94,11 @@ export default function FamilyView() {
     void resolveView().then((next) => {
       if (cancelled) return;
       if (code) {
-        setOauthProblem(code === "identity_already_exists" ? "identity_already_exists" : "other");
+        setOauthProblem(
+          code === "identity_already_exists"
+            ? "identity_already_exists"
+            : "other",
+        );
         // A hibakód ne maradjon az URL-ben (újratöltéskor ne jelenjen meg újra).
         window.history.replaceState(null, "", window.location.pathname);
       }
@@ -94,20 +114,37 @@ export default function FamilyView() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="stack">
       {oauthProblem && <OAuthBanner problem={oauthProblem} />}
-      {view.kind === "loading" && <p>Betöltés…</p>}
-      {view.kind === "unavailable" && <p className="font-bold">A családi funkció most nem elérhető.</p>}
+      {view.kind === "loading" && (
+        <p className="panel loading-status" role="status">
+          <span className="spinner" aria-hidden="true" />
+          Családi védőháló betöltése…
+        </p>
+      )}
+      {view.kind === "unavailable" && (
+        <p className="notice" role="status">
+          <Icon name="help" />A családi funkció most nem elérhető.
+        </p>
+      )}
       {view.kind === "signed_out" && <SignedOut />}
       {view.kind === "load_failed" && (
-        <section className="flex flex-col gap-4">
-          <p className="font-bold">A családi adatokat most nem sikerült betölteni.</p>
-          <button type="button" onClick={() => void reload()} className={BUTTON_OUTLINE}>
+        <section className="panel stack">
+          <p className="notice notice-error">
+            A családi adatokat most nem sikerült betölteni.
+          </p>
+          <button
+            type="button"
+            onClick={() => void reload()}
+            className={BUTTON_OUTLINE}
+          >
             Újrapróbálás
           </button>
         </section>
       )}
-      {view.kind === "ready" && <Ready memberships={view.memberships} onChange={reload} />}
+      {view.kind === "ready" && (
+        <Ready memberships={view.memberships} onChange={reload} />
+      )}
       {(view.kind === "ready" || view.kind === "load_failed") && (
         <button
           type="button"
@@ -134,8 +171,10 @@ function OAuthBanner({ problem }: { problem: OAuthProblem }) {
     );
   }
   return (
-    <section role="alert" className="flex flex-col gap-4 border-2 border-black p-4">
-      <p className="font-bold">Ez a Google-fiók már egy másik mentett fiókhoz tartozik.</p>
+    <section role="alert" className="notice notice-error flex-col">
+      <p className="font-bold">
+        Ez a Google-fiók már egy másik mentett fiókhoz tartozik.
+      </p>
       <button
         type="button"
         onClick={() => {
@@ -146,7 +185,11 @@ function OAuthBanner({ problem }: { problem: OAuthProblem }) {
       >
         Belépés ezzel a Google-fiókkal
       </button>
-      {failed && <p className="font-bold">A belépés most nem sikerült. Próbáld újra később.</p>}
+      {failed && (
+        <p className="font-bold">
+          A belépés most nem sikerült. Próbáld újra később.
+        </p>
+      )}
     </section>
   );
 }
@@ -170,11 +213,34 @@ function SignedOut() {
   }
 
   return (
-    <section className="flex flex-col gap-4">
-      <p className="text-lg">A családi védőhálóhoz mentsd a fiókodat. Az ellenőrzéshez nem kell.</p>
-      <button type="button" onClick={save} disabled={busy} className={BUTTON}>
-        Fiók mentése Google-lal
+    <section className="panel family-signin">
+      <span className="section-icon">
+        <Icon name="family" />
+      </span>
+      <h2>Együtt könnyebb figyelni.</h2>
+      <p>
+        Mentsd a fiókodat, hogy létrehozhass egy családot, vagy csatlakozhass a
+        szeretteidhez.
+      </p>
+      <button
+        type="button"
+        onClick={save}
+        disabled={busy}
+        className={BUTTON_OUTLINE}
+      >
+        {busy ? (
+          <span className="spinner" aria-hidden="true" />
+        ) : (
+          <span className="google-icon" aria-hidden="true">
+            G
+          </span>
+        )}
+        {busy ? "Kapcsolódás…" : "Fiók mentése Google-lal"}
       </button>
+      <p className="privacy-note">
+        <Icon name="lock" />A családod csak a szervezet nevét és az időpontot
+        látja. Az üzeneted tartalmát nem.
+      </p>
       {failed && (
         <p role="alert" className="font-bold">
           A Google-fiók mentése most nem sikerült. Próbáld újra később.
@@ -184,7 +250,13 @@ function SignedOut() {
   );
 }
 
-function Ready({ memberships, onChange }: { memberships: Membership[]; onChange: () => Promise<void> }) {
+function Ready({
+  memberships,
+  onChange,
+}: {
+  memberships: Membership[];
+  onChange: () => Promise<void>;
+}) {
   const owner = memberships.find((m) => m.role === "owner");
   const member = memberships.find((m) => m.role === "member");
   if (!owner && !member) return <Setup onDone={onChange} />;
@@ -222,10 +294,22 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
   }
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col gap-4">
-        <button type="button" onClick={create} disabled={busy !== null} className={BUTTON}>
-          {busy === "create" ? "Egy pillanat…" : "Család létrehozása (én figyelek valakire)"}
+    <div className="stack family-setup">
+      <section className="panel stack">
+        <span className="section-icon">
+          <Icon name="family" />
+        </span>
+        <h2>Én figyelek valakire</h2>
+        <p>
+          Hozz létre egy családot, és add át a kapott kódot a családtagodnak.
+        </p>
+        <button
+          type="button"
+          onClick={create}
+          disabled={busy !== null}
+          className={BUTTON}
+        >
+          {busy === "create" ? "Egy pillanat…" : "Család létrehozása"}
         </button>
         {createError && (
           <p role="alert" className="font-bold">
@@ -233,7 +317,7 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
           </p>
         )}
       </section>
-      <form onSubmit={join} className="flex flex-col gap-4">
+      <form onSubmit={join} className="panel stack">
         <h2 className="text-xl font-bold">Csatlakozás családhoz</h2>
         <label htmlFor="family-code" className="text-lg">
           Írd be a 6 karakteres családkódot:
@@ -248,9 +332,14 @@ function Setup({ onDone }: { onDone: () => Promise<void> }) {
           autoCorrect="off"
           spellCheck={false}
           maxLength={12}
-          className="min-h-[56px] w-full border-2 border-black px-4 text-3xl font-bold tracking-[0.2em]"
+          className="family-input"
+          placeholder="ABC123"
         />
-        <button type="submit" disabled={busy !== null} className={BUTTON_OUTLINE}>
+        <button
+          type="submit"
+          disabled={busy !== null}
+          className={BUTTON_OUTLINE}
+        >
           {busy === "join" ? "Egy pillanat…" : "Csatlakozás családhoz"}
         </button>
         {joinError && (
@@ -282,7 +371,10 @@ function useAlerts(familyId: string) {
         .limit(ALERT_LIMIT);
       if (cancelled) return;
       setFailed(!!error);
-      if (!error) setAlerts((data ?? []).map(toAlertRow).filter((a): a is AlertRow => a !== null));
+      if (!error)
+        setAlerts(
+          (data ?? []).map(toAlertRow).filter((a): a is AlertRow => a !== null),
+        );
     };
     const onVisible = () => {
       if (document.visibilityState === "visible") void fetchAlerts();
@@ -295,22 +387,40 @@ function useAlerts(familyId: string) {
     };
   }, [familyId]);
 
-  const add = useCallback((alert: AlertRow) => setAlerts((list) => mergeAlert(list ?? [], alert)), []);
+  const add = useCallback(
+    (alert: AlertRow) => setAlerts((list) => mergeAlert(list ?? [], alert)),
+    [],
+  );
   return { alerts, failed, add };
 }
 
-function History({ alerts, failed }: { alerts: AlertRow[] | null; failed: boolean }) {
+function History({
+  alerts,
+  failed,
+}: {
+  alerts: AlertRow[] | null;
+  failed: boolean;
+}) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-xl font-bold">Előzmények</h2>
+    <section className="panel stack family-panel">
+      <h2>Korábbi riasztások</h2>
       {failed && <p>Az előzményeket most nem sikerült betölteni.</p>}
       {!failed && alerts === null && <p>Betöltés…</p>}
-      {alerts && alerts.length === 0 && <p>Még nem volt PIROS ítélet.</p>}
+      {alerts && alerts.length === 0 && (
+        <div className="history-empty">
+          <Icon name="bell" />
+          <p>Még nem érkezett piros riasztás.</p>
+          <p className="text-xs mt-1">
+            Itt látod majd a családodhoz tartozó jelzéseket.
+          </p>
+        </div>
+      )}
       {alerts && alerts.length > 0 && (
         <ul className="flex flex-col gap-3">
           {alerts.map((a) => (
-            <li key={a.id} className="border-l-4 border-red-700 pl-3">
-              {alertLine(a)}
+            <li key={a.id} className="history-row">
+              <Icon name="alert" />
+              <span>{alertLine(a)}</span>
             </li>
           ))}
         </ul>
@@ -325,7 +435,9 @@ let audioContext: AudioContext | null = null;
 function unlockAudio() {
   try {
     const Ctx =
-      window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
     if (!Ctx) return;
     audioContext ??= new Ctx();
     void audioContext.resume().catch(() => {});
@@ -354,7 +466,12 @@ function beep() {
 
 // Androidon a new Notification() tiltott, ezért a service workeren át jelenítjük meg.
 async function showSystemNotification(alert: AlertRow) {
-  if (!("Notification" in window) || Notification.permission !== "granted" || !("serviceWorker" in navigator)) return;
+  if (
+    !("Notification" in window) ||
+    Notification.permission !== "granted" ||
+    !("serviceWorker" in navigator)
+  )
+    return;
   try {
     const registration = await navigator.serviceWorker.ready;
     await registration.showNotification("Rákattintsak? – Figyelem!", {
@@ -370,7 +487,9 @@ async function showSystemNotification(alert: AlertRow) {
 type Permission = NotificationPermission | "unsupported";
 
 function currentPermission(): Permission {
-  return typeof window !== "undefined" && "Notification" in window ? Notification.permission : "unsupported";
+  return typeof window !== "undefined" && "Notification" in window
+    ? Notification.permission
+    : "unsupported";
 }
 
 function OwnerPanel({ familyId, code }: { familyId: string; code: string }) {
@@ -412,7 +531,12 @@ function OwnerPanel({ familyId, code }: { familyId: string; code: string }) {
       .channel(`family-alerts-${familyId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "alerts", filter: `family_id=eq.${familyId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "alerts",
+          filter: `family_id=eq.${familyId}`,
+        },
         (payload) => {
           const alert = toAlertRow(payload.new);
           if (!alert) return;
@@ -449,36 +573,69 @@ function OwnerPanel({ familyId, code }: { familyId: string; code: string }) {
   return (
     <section className="flex flex-col gap-6">
       {latest && (
-        <div role="alert" className="border-4 border-red-700 bg-red-700 p-4 text-white">
-          <p className="text-2xl font-bold">
-            Figyelem! Nagy valószínűséggel csaló üzenetet ellenőriztek: {latest.brand},{" "}
-            {formatAlertTime(latest.created_at)}
+        <div role="alert" className="notice notice-error">
+          <p className="font-semibold">
+            Figyelem! Nagy valószínűséggel csaló üzenetet ellenőriztek:{" "}
+            {latest.brand}, {formatAlertTime(latest.created_at)}
           </p>
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
-        <p className="text-lg">Add meg ezt a kódot a nagyi telefonján a Családi védőháló oldalon:</p>
-        <p className="text-5xl font-bold tracking-[0.2em]" aria-label={`Családkód: ${code.split("").join(" ")}`}>
+      <div className="panel stack family-panel">
+        <h2>A családod meghívókódja</h2>
+        <p className="text-sm text-[var(--muted)]">
+          Add meg ezt a kódot a nagyi telefonján a Családi védőháló oldalon:
+        </p>
+        <p
+          className="family-code"
+          aria-label={`Családkód: ${code.split("").join(" ")}`}
+        >
           {code}
         </p>
         {members !== null && (
-          <p>{members === 0 ? "Még senki nem csatlakozott." : `Csatlakozott családtagok száma: ${members}`}</p>
+          <p>
+            {members === 0
+              ? "Még senki nem csatlakozott."
+              : `Csatlakozott családtagok száma: ${members}`}
+          </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-lg font-bold">Azonnal csak akkor szól, ha ez az oldal nyitva van.</p>
-        {live === "on" && <p>Élő figyelés: bekapcsolva.</p>}
-        {live === "off" && <p>Az élő figyelés most nem kapcsolódik. Töltsd újra az oldalt.</p>}
+      <div className="panel stack family-panel">
+        <h2>Értesítések</h2>
+        <p className="text-sm text-[var(--muted)]">
+          Azonnal csak akkor szól, ha ez az oldal nyitva van.
+        </p>
+        {live === "on" && (
+          <p className="status-line">
+            <span className="status-dot" />
+            Élő figyelés: bekapcsolva.
+          </p>
+        )}
+        {live === "connecting" && (
+          <p className="status-line">
+            <span className="spinner" aria-hidden="true" />
+            Kapcsolódás az élő figyeléshez…
+          </p>
+        )}
+        {live === "off" && (
+          <p>Az élő figyelés most nem kapcsolódik. Töltsd újra az oldalt.</p>
+        )}
         {permission === "default" && (
-          <button type="button" onClick={enableNotifications} className={BUTTON_OUTLINE}>
+          <button
+            type="button"
+            onClick={enableNotifications}
+            className={BUTTON_OUTLINE}
+          >
             Értesítések engedélyezése
           </button>
         )}
         {permission === "granted" && <p>Értesítések: engedélyezve.</p>}
         {permission === "denied" && (
-          <p>Az értesítések le vannak tiltva. A böngésző beállításaiban engedélyezheted őket.</p>
+          <p>
+            Az értesítések le vannak tiltva. A böngésző beállításaiban
+            engedélyezheted őket.
+          </p>
         )}
       </div>
 
@@ -491,9 +648,10 @@ function MemberPanel({ familyId }: { familyId: string }) {
   const { alerts, failed } = useAlerts(familyId);
   return (
     <section className="flex flex-col gap-6">
-      <p className="text-lg">
-        Csatlakoztál a családhoz. Ha egy ellenőrzés PIROS ítéletet ad, a családod értesítést kap. Csak a szervezet
-        nevét és az időpontot látják, az üzenetet nem.
+      <p className="panel text-base">
+        Csatlakoztál a családhoz. Ha egy ellenőrzés PIROS ítéletet ad, a
+        családod értesítést kap. Csak a szervezet nevét és az időpontot látják,
+        az üzenetet nem.
       </p>
       <History alerts={alerts} failed={failed} />
     </section>
