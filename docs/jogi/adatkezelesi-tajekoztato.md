@@ -13,7 +13,7 @@
 
 - **A beküldött üzenetet nem mentjük el.** A szöveg vagy a kép csak az ellenőrzés néhány másodpercéig van nálunk, a memóriában. Nem kerül adatbázisba, naplóba vagy fájlba.
 - Az üzenetet **egy mesterséges intelligencia** (az Anthropic cég Claude Haiku 4.5 modellje) olvassa ki. Az Anthropic a saját szabályai szerint **legfeljebb 30 napig** őrzi meg, és **nem tanít rajta** modellt.
-- Nem kérjük a neved, az e-mail-címed vagy a telefonszámod. Első megnyitáskor a készüléked egy **névtelen azonosítót** kap. Ehhez kötjük, hány ellenőrzést végeztél aznap.
+- Nem kérjük a neved, az e-mail-címed vagy a telefonszámod. Az első ellenőrzésedkor a készüléked egy **névtelen azonosítót** kap. Ehhez kötjük, hány ellenőrzést végeztél aznap.
 - Az IP-címedet csak **titkosított (hash-elt) formában**, néhány óráig tároljuk, hogy a szolgáltatással ne lehessen visszaélni.
 - A családi funkcióban a család tagjai **csak annyit látnak**, hogy melyik szervezet nevében érkezett PIROS üzenet, és mikor. Az üzenet tartalmát nem.
 - Nincs reklám, nincs látogatottságmérés, nincs marketing. **Adatot nem adunk el.**
@@ -103,7 +103,7 @@ A hash-elt IP-cím is **személyes adatnak** minősül, mert a titkos kulcs nál
 
 | | |
 |---|---|
-| **Adatok** | Első megnyitáskor a Szolgáltatás a háttérben **névtelen (anonim) felhasználót** hoz létre. Ehhez nem kell név, e-mail-cím vagy telefonszám. A Supabase felhasználói nyilvántartásában (`auth.users`) ez tárolódik róla: a véletlenszerű azonosító, a névtelen jelző (`is_anonymous`), a létrehozás és az utolsó belépés ideje. A bejelentkezési munkamenethez (`auth.sessions`) a Supabase rögzíti az IP-címet és a böngésző azonosítóját (user agent). A bejelentkezési eseménynaplóba is kerül IP-cím. Napi használat: `usage` tábla: `user_id`, `day` (magyar idő szerinti nap), `count` (ellenőrzések száma), `red_count` (ebből PIROS ítéletek száma). |
+| **Adatok** | Az első ellenőrzésedkor, illetve a Családi védőháló oldal megnyitásakor a Szolgáltatás a háttérben **névtelen (anonim) felhasználót** hoz létre. Ehhez nem kell név, e-mail-cím vagy telefonszám. A Supabase felhasználói nyilvántartásában (`auth.users`) ez tárolódik róla: a véletlenszerű azonosító, a névtelen jelző (`is_anonymous`), a létrehozás és az utolsó belépés ideje. A bejelentkezési munkamenethez (`auth.sessions`) a Supabase rögzíti az IP-címet és a böngésző azonosítóját (user agent). A bejelentkezési eseménynaplóba is kerül IP-cím. Napi használat: `usage` tábla: `user_id`, `day` (magyar idő szerinti nap), `count` (ellenőrzések száma), `red_count` (ebből PIROS ítéletek száma). |
 | **Cél** | Egy felhasználó naponta legfeljebb 30 ellenőrzést végezhessen (visszaélés-megelőzés). A névtelen fiókhoz később Google-fiókot köthetsz, és ezzel elérheted a családi funkciót. |
 | **Jogalap** | A napi korlát esetében GDPR 6. cikk (1) bekezdés f) pont, jogos érdek ([12. fejezet](#12-érdekmérlegelés-összefoglaló)). A fiókmentés lehetővé tétele esetében GDPR 6. cikk (1) bekezdés b) pont. |
 | **Megőrzés** | A fiók és a napi használati sorok **a fiók törléséig** maradnak meg. Automatikus törlés jelenleg nincs, a törlést bármikor kérheted ([10. fejezet](#10-milyen-jogaid-vannak)). A munkamenet a kijelentkezésig vagy a lejáratáig él, utána legfeljebb 24 órával a Supabase törli. A Supabase bejelentkezési eseménynaplója és rendszernaplói **7 napig** maradnak meg. |
@@ -129,7 +129,7 @@ A családi funkcióval egy családtag (a továbbiakban: **unoka**) figyelmeztet�
 | **Cél** | A családtagok értesítése, hogy egy idősebb hozzátartozójuk csaló üzenetet kaphatott, és segíthessenek neki. |
 | **Jogalap** | GDPR 6. cikk (1) bekezdés b) pont. A családot az unoka hozza létre. A nagyi **maga írja be a családkódot**, és ezzel kéri, hogy a PIROS ítéleteiről a család értesítést kapjon. |
 | **Kik látják** | A család tagjai: a családot, a tagságokat (csak azonosítóként, név nélkül) és a riasztásokat. A családi oldalon legfeljebb az utolsó 50 riasztás jelenik meg, valós időben. Ha az unoka engedélyezte, a böngészője értesítést is mutat. Az értesítést a készüléke jeleníti meg, külső értesítési (push) szolgáltatást nem használunk. |
-| **Megőrzés** | A család, illetve az érintett fiók törléséig. Ha a családot vagy egy fiókot törlünk, a hozzá tartozó tagságok és riasztások is törlődnek. A kilépést, a család törlését vagy a riasztások törlését jelenleg e-mailben kérheted. |
+| **Megőrzés** | A család, illetve az érintett fiók törléséig. Ha a családot töröljük, a tagságai és a riasztásai is törlődnek. Ha egy nagyi fiókját töröljük vagy kilép, a tagsága és az ő PIROS ítéleteiből született riasztások törlődnek. A kilépést, a család törlését vagy a riasztások törlését jelenleg e-mailben kérheted. |
 
 ### 4.7. Üzemeltetési naplók
 
@@ -138,13 +138,13 @@ A családi funkcióval egy családtag (a továbbiakban: **unoka**) figyelmeztet�
 | **Adatok** | A tárhelyszolgáltatónk (Vercel) minden kérésről naplót vezet: IP-cím, böngészőazonosító, a kért oldal címe, időpont. **A mi programkódunk ebbe csak egy hibakódot és a hiba típusát írja**, az üzenet tartalmát soha. |
 | **Cél** | A Szolgáltatás működtetése, hibakeresés, biztonság. |
 | **Jogalap** | GDPR 6. cikk (1) bekezdés f) pont, jogos érdek ([12. fejezet](#12-érdekmérlegelés-összefoglaló)). |
-| **Megőrzés** | A Vercel futásidejű naplóit a Vercel **legfeljebb 1 napig** őrzi meg. A Supabase rendszernaplói **7 napig** maradnak meg. |
+| **Megőrzés** | A Vercel futásidejű naplóit a Vercel a mi előfizetési csomagunkban (Pro) **1 napig** őrzi meg. A Supabase rendszernaplói **7 napig** maradnak meg. |
 
 ### 4.8. Kapcsolattartás, kérelmek és panaszok
 
 | | |
 |---|---|
-| **Adatok** | Ha írsz nekünk: az e-mail-címed, a neved (ha megadod), a leveled tartalma és a válaszunk. |
+| **Adatok** | Ha írsz vagy telefonálsz nekünk: az e-mail-címed vagy a telefonszámod, a neved (ha megadod), a leveled vagy a panaszod tartalma, telefonos panasznál a jegyzőkönyv (benne a neved és a lakcímed vagy e-mail-címed), és a válaszunk. |
 | **Cél** | A kérdésed, adatvédelmi kérelmed vagy panaszod intézése. |
 | **Jogalap** | Adatvédelmi kérelem és fogyasztói panasz esetén a **GDPR 6. cikk (1) bekezdés c) pontja**: a GDPR 12–22. cikke, illetve az Fgytv. 17/A. §-a szerinti jogi kötelezettség. Egyéb megkeresés esetén a GDPR 6. cikk (1) bekezdés f) pontja: jogos érdekünk, hogy válaszolhassunk. |
 | **Megőrzés** | Fogyasztói panasz és a rá adott válasz: **3 év** (Fgytv. 17/A. § (7) bekezdés). Adatvédelmi kérelem: a kérelem lezárásától számított **5 év**, az általános elévülési idő (Ptk. 6:22. §), hogy utólag igazolni tudjuk, mit tettünk. Egyéb levelezés: a lezárástól számított **1 év**. |

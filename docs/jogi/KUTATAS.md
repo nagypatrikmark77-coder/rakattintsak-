@@ -16,7 +16,7 @@ Rövidítések: **A** = GDPR és NAIH, **B** = adatfeldolgozók, **C** = ÁSZF �
 | 2 | Az Anthropic **nincs** az EU–USA Adatvédelmi Keretrendszer (DPF) listáján. Mérve: sem az aktív, sem az inaktív résztvevők között nem szerepel. A továbbítás alapja tehát az SCC. | A, B | Adatkezelési tájékoztató 6. |
 | 3 | Az Anthropic API-n beküldött be- és kimenetet **30 napon belül törli**. Ha egy tartalmat szabálysértőnek jelöl meg, azt legfeljebb 2 évig, a biztonsági pontszámot legfeljebb 7 évig őrzi. Az API-adaton **nem tanít** modellt. (Egy platformoldal szerint alapból nincs megőrzés, a két hivatalos oldal nem egyezik. A konzervatív 30 nap került be.) | B | Adatkezelési tájékoztató 4.1, 5. |
 | 4 | Az Anthropicnál a nyugvó adat és a képfeldolgozás csak az USA-ban lehet. EU-s feldolgozási régió 2026-ban nincs, a Haiku 4.5-nél nem is állítható. | B | Adatkezelési tájékoztató 5. |
-| 5 | A Vercel Inc. **DPF-tanúsított** (mérve). DPA-t **csak Pro és Enterprise terven** ad. A Hobby terv csak nem kereskedelmi használatra való. A kérésnapló tartalmazza a látogató IP-címét. Megőrzés: Hobby 1 óra, Pro 1 nap. | B | Adatkezelési tájékoztató 4.7, 5–6.; **README nyitott tétel** |
+| 5 | A Vercel Inc. **DPF-tanúsított** (mérve). DPA-t **csak Pro és Enterprise terven** ad. A Hobby terv csak nem kereskedelmi használatra való. A kérésnapló tartalmazza a látogató IP-címét. Megőrzés: Hobby 1 óra, Pro 1 nap. **A projekt csapatának csomagja Pro** (a Vercel API-ján ellenőrizve). | B | Adatkezelési tájékoztató 4.7, 5–6. |
 | 6 | A szerverfunkció mérve az **USA-ban (iad1, Washington)** fut, ez a Vercel alapértelmezése. | B | Adatkezelési tájékoztató 5. |
 | 7 | A Supabase-szel a **Supabase Pte. Ltd. (Szingapúr)** szerződik. A DPA automatikus és SCC-t tartalmaz. DPF nincs. A projekt régiója `eu-west-1` (Írország), a szervezet terve Pro (mérve). Az auth-munkamenet IP-t és böngészőazonosítót tárol, az auditnapló IP-t. A naplók 7 napig maradnak meg Pro terven. Anonim fiókokat a Supabase nem töröl automatikusan. | B | Adatkezelési tájékoztató 4.4, 5–6. |
 | 8 | A Google-bejelentkezésnél a Google Ireland Limited **önálló adatkezelő**. Név, e-mail-cím, profilkép és azonosító érkezik tőle. | B | Adatkezelési tájékoztató 4.5 |
@@ -36,7 +36,7 @@ Rövidítések: **A** = GDPR és NAIH, **B** = adatfeldolgozók, **C** = ÁSZF �
 | 22 | A magyar MI-hatóság az **MI Piacfelügyeleti Hatóság** (Mesterséges Intelligencia Hivatal, Tudományos és Technológiai Minisztérium), nem az NMHH. | D | Jogi nyilatkozat |
 | 23 | DSA: maga az ellenőrzés valószínűleg nem közvetítő szolgáltatás (saját mérlegelés). A családi riasztás szürke zóna. A 11., 12. és 14. cikk szerinti elemek olcsón beírhatók. | D | ÁSZF |
 | 24 | Az Eht. 155. § (4) szövegében **nincs** „feltétlenül szükséges” kivétel. A NAIH a WP29 4/2012. számú véleményét alkalmazza. Hozzájárulás nem kell, **de első látogatáskor egyszeri, rövid tájékoztatás kell** (NAIH/2017/1060/V). A localStorage és a Cache API is tárolásnak számít (EDPB 2/2023). | D | Adatkezelési tájékoztató 7.; README |
-| 25 | A WP29 szerint a **tartós bejelentkezés nem esik a kivétel alá**. A csendes, első megnyitáskor létrejövő anonim munkamenet ezért kockázatos pont. | D | **README: döntés kell** |
+| 25 | A WP29 szerint a **tartós bejelentkezés nem esik a kivétel alá**. A kód szerint a főoldalon a munkamenet az első ellenőrzéskor jön létre, ami rendben van. A Családi védőháló oldal viszont már megnyitáskor létrehozza. | D, kód | **README D1** |
 | 26 | Ingyenes szolgáltatásnál a **Ptk. 6:147. §** az irányadó. A téves ítéletből eredő kárért szándékosság esetén, vagy akkor van felelősség, ha nem tájékoztattunk egy lényeges tulajdonságról. A „SZÜRKE ≠ biztonságos” mondat maga ez a tájékoztatás. | C | ÁSZF, Jogi nyilatkozat |
 | 27 | A felelősségkorlátozás **szokatlan kikötés**: külön figyelemfelhívás és kifejezett elfogadás kell hozzá (Ptk. 6:78. § (2), BH 2025.1.17). A 6:152. § és a 6:104. § (1) h) korlátai abszolútak. | C | ÁSZF; README |
 | 28 | Panaszkezelés az Fgytv. 17/A. § szerint: 30 napon belül érdemi válasz, a panaszt és a választ 3 évig meg kell őrizni. A békéltető testület a fogyasztó lakóhelye szerinti. A Hajdú-Bihar Vármegyei Békéltető Testület címe 4025 Debrecen, Vörösmarty u. 13–15. | C | ÁSZF; Adatkezelési tájékoztató 4.8 |
@@ -129,7 +129,7 @@ Rövidítések: **A** = GDPR és NAIH, **B** = adatfeldolgozók, **C** = ÁSZF �
 
 ## 3. Mit nem sikerült ellenőrizni
 
-- **Vercel-terv:** Hobby vagy Pro. Hobby esetén nincs DPA, és a Kft. általi használat kereskedelminek minősül. Lásd a README nyitott tételeit.
+- **Vercel Observability Plus:** be van-e kapcsolva. Ha igen, a naplók 30 napig maradnak meg. A csomag Pro, ez ellenőrizve.
 - **Anthropic szerződő entitása a valóságban:** a Console számlázási országa, illetve a számlán szereplő eladó.
 - **Supabase auth-táblák tényleges tartalma:** ki van-e töltve a `sessions.ip`, ír-e az auditnapló az adatbázisba, és milyen kulcsok vannak a Google `identity_data` mezőjében. A csak darabszámokat kérő lekérdezést a jogosultsági rendszer nem engedte lefuttatni, ezt Patriknak kell engedélyeznie vagy lefuttatnia.
 - **Felolvasás** Androidon, Edge-ben és iOS-en.
