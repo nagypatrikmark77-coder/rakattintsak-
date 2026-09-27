@@ -1,0 +1,99 @@
+{
+  "_meta": {
+    "updated": "2026-09-27",
+    "principle": "Elso a bank, masodik a rendorseg (KiberPajzs sorrend). Telefonszamot csak az official_entities.json verified:true bejegyzesebol mutass, egyebkent: 'a kartyad hatoldalan vagy a bank hivatalos oldalan talalod'.",
+    "sources": [
+      "https://kiberpajzs.hu/bejelentest-szeretnek-tenni",
+      "https://www.otpbank.hu/portal/hu/adathalaszat",
+      "https://www.police.hu/hu/ugyintezes/mit-tegyek",
+      "https://www.police.hu/hu/ugyintezes/beadvanytetel"
+    ]
+  },
+  "questions": [
+    { "id": "gave_card", "text": "Megadtad a bankkártyád adatait (szám, lejárat, CVC)?" },
+    { "id": "gave_login", "text": "Megadtad a netbank vagy mobilbank belépési adataidat?" },
+    { "id": "gave_code", "text": "Megadtál vagy elküldtél SMS-ben kapott kódot?" },
+    { "id": "installed_app", "text": "Telepítettél alkalmazást a kérésükre?" },
+    { "id": "sent_money", "text": "Utaltál pénzt?" },
+    { "id": "gave_personal", "text": "Megadtál személyes adatot (név, cím, anyja neve, igazolványszám)?" }
+  ],
+  "steps": {
+    "bank_urgent": {
+      "trigger_any": ["gave_card", "gave_login", "gave_code", "sent_money"],
+      "priority": 1,
+      "title": "Most azonnal: hívd a bankodat",
+      "items": [
+        "Tiltsd le a kártyádat a mobilbankban, vagy hívd a bankod 0-24 órás számát.",
+        "A számot a kártyád hátoldalán vagy a bank hivatalos oldalán találod. Ne az üzenetben kapott számot hívd.",
+        "Mondd el, mit adtál meg és mikor. Minél hamarabb szólsz, annál nagyobb az esély a kár csökkentésére."
+      ]
+    },
+    "change_login": {
+      "trigger_any": ["gave_login"],
+      "priority": 2,
+      "title": "Változtasd meg a belépési adataidat",
+      "items": [
+        "Egy másik, biztonságos eszközről változtasd meg a netbank / mobilbank jelszavadat.",
+        "Ha ugyanazt a jelszót máshol is használod, ott is cseréld le."
+      ]
+    },
+    "app_installed": {
+      "trigger_any": ["installed_app"],
+      "priority": 1,
+      "title": "Ne használd tovább ezt a telefont banki ügyre",
+      "items": [
+        "A telepített alkalmazással átvehetik az irányítást a telefonod felett.",
+        "Hívd a bankodat egy MÁSIK telefonról.",
+        "Ha rendőrségi eljárást kérsz, ne töröld és ne állítsd vissza az eszközt, mert bizonyíték lehet rajta."
+      ]
+    },
+    "police": {
+      "trigger_any": ["gave_card", "gave_login", "gave_code", "installed_app", "sent_money"],
+      "priority": 3,
+      "title": "Tegyél feljelentést",
+      "items": [
+        "A bank után minél hamarabb jelezd a rendőrségen: 112, vagy személyesen bármelyik rendőrkapitányságon.",
+        "Online is lehet feljelenteni Ügyfélkapuval: ugyintezes.police.hu (Új ügy indítása).",
+        "Mentsd el az üzenetet és a linket bizonyítéknak (screenshot), mielőtt törlöd."
+      ],
+      "links": [
+        { "label": "KiberPajzs: Bejelentést szeretnék tenni", "url": "https://kiberpajzs.hu/bejelentest-szeretnek-tenni" },
+        { "label": "Rendőrség online ügyintézés", "url": "https://ugyintezes.police.hu/web/guest/uj-ugy-inditasa" }
+      ]
+    },
+    "victim_support": {
+      "trigger_any": ["sent_money", "gave_card", "gave_login"],
+      "priority": 4,
+      "title": "Nem vagy egyedül",
+      "items": [
+        "Az Áldozatsegítő Vonal éjjel-nappal ingyenesen hívható: 06 80 225 225.",
+        "Aki pénzt kér azért, hogy visszaszerezze az ellopott pénzed, az újabb csaló."
+      ],
+      "links": [ { "label": "Áldozatsegítés", "url": "https://vansegitseg.im.gov.hu" } ]
+    },
+    "personal_data_only": {
+      "trigger_any": ["gave_personal"],
+      "priority": 5,
+      "title": "Légy óvatos a következő napokban",
+      "items": [
+        "A megadott adatokkal hitelesebbnek tűnő újabb üzenetekkel vagy hívásokkal kereshetnek.",
+        "Ha a bankod nevében hívnak, tedd le, és te hívd vissza a hivatalos számon."
+      ]
+    },
+    "nothing_given": {
+      "trigger_none": ["gave_card", "gave_login", "gave_code", "installed_app", "sent_money", "gave_personal"],
+      "priority": 9,
+      "title": "Valószínűleg nem történt baj",
+      "items": [
+        "Ha csak megnyitottad az oldalt és semmit nem adtál meg, általában nem keletkezik kár.",
+        "Zárd be az oldalt, töröld az üzenetet.",
+        "Ha bármit telepíteni kért az oldal, ne tedd meg."
+      ]
+    }
+  },
+  "report_phishing_optional": [
+    { "entity": "mvm", "email": "adathalasz@mvm.hu" },
+    { "entity": "erste", "email": "abuse@erstebank.hu" },
+    { "entity": "general", "email": "csirt@nki.gov.hu", "note": "NBSZ NKI incidensbejelentes" }
+  ]
+}

@@ -9,8 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "eval": "tsx scripts/eval.ts",
-    "icons": "node scripts/icons.mjs"
+    "eval": "tsx --env-file-if-exists=.env.local scripts/eval.ts",
+    "icons": "node scripts/icons.mjs",
+    "check:privacy": "node scripts/check-privacy.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

@@ -1,0 +1,316 @@
+{
+  "_meta": {
+    "updated": "2026-09-27",
+    "rule": "Csak verified:true domain kerulhet a whitelistbe. Hianyzo hivatalos domain = legfeljebb sarga (biztonsagos hiba). Hibasan felvett domain = csalot engedunk at (veszelyes hiba).",
+    "sms_link_policy_values": {
+      "never": "A szervezet SMS-ben/e-mailben soha nem kuld ugyintezesi linket. Barmilyen link = PIROS, akkor is, ha hivatalos domain.",
+      "path_restricted": "Csak a megadott URL-utvonal lehet hivatalos. Minden mas = PIROS.",
+      "official_only": "Link csak hivatalos domainre mutathat. Nem hivatalos = PIROS.",
+      "unknown": "Nincs hivatalos nyilatkozat. Alap szabalyok ervenyesek."
+    }
+  },
+  "entities": [
+    {
+      "id": "otp",
+      "name": "OTP Bank",
+      "category": "bank",
+      "aliases": ["OTP", "OTP Bank Nyrt", "OTPdirekt", "OTP SZÉP"],
+      "official_domains": ["otpbank.hu"],
+      "official_url": "https://www.otpbank.hu/portal/hu/adathalaszat",
+      "sms_link_policy": "official_only",
+      "contacts": {
+        "card_block_24h": "+36 1 366 6000",
+        "fraud_victim_24h": "+36 1 366 6800",
+        "general_24h": "+36 1 366 6666"
+      },
+      "verified": true,
+      "sources": [
+        "https://www.otpbank.hu/portal/hu/kapcsolat",
+        "https://www.otpbank.hu/portal/hu/adathalaszat"
+      ]
+    },
+    {
+      "id": "kh",
+      "name": "K&H Bank",
+      "category": "bank",
+      "aliases": ["K&H", "KH Bank", "K and H", "K&H TeleCenter"],
+      "official_domains": ["kh.hu"],
+      "official_url": "https://www.kh.hu/biztonsag-a-penzugyekben",
+      "sms_link_policy": "official_only",
+      "contacts": {
+        "card_block_24h_free": "+36 80 414 243",
+        "general": "+36 1 335 3355"
+      },
+      "verified": true,
+      "sources": [
+        "https://www.kh.hu/digitalis-bankolas/telecenter",
+        "https://www.kh.hu/cikkek/bankkartya-letiltasa"
+      ]
+    },
+    {
+      "id": "mbh",
+      "name": "MBH Bank",
+      "category": "bank",
+      "aliases": ["MBH", "MBH Bank Nyrt", "MKB", "Takarékbank", "Budapest Bank", "Telebank"],
+      "official_domains": ["mbhbank.hu"],
+      "legacy_domains_unverified": ["mkb.hu", "takarekbank.hu", "takarek.hu", "budapestbank.hu"],
+      "official_url": "https://www.mbhbank.hu/csalasmegelozes",
+      "sms_link_policy": "never",
+      "sms_link_policy_note": "A bank sem SMS-ben, sem e-mailben nem keri adatai frissiteset, SMS-ben kapott linket ne nyisson meg (sajat kozlemeny).",
+      "contacts": {
+        "general_and_card_block_24h_free": "06 80 350 350",
+        "from_abroad": "+36 1 373 3399"
+      },
+      "verified": true,
+      "sources": ["https://www.mbhbank.hu/csalasmegelozes", "https://www.mbhbank.hu/lakossagi"]
+    },
+    {
+      "id": "erste",
+      "name": "Erste Bank",
+      "category": "bank",
+      "aliases": ["Erste", "Erste Bank Hungary"],
+      "official_domains": ["erstebank.hu"],
+      "official_url": "https://www.erstebank.hu/hu/ebh-nyito/biztonsagi-kozpont",
+      "sms_link_policy": "official_only",
+      "contacts": {
+        "card_block": "+36 1 302 5885",
+        "report_phishing_email": "abuse@erstebank.hu"
+      },
+      "verified": true,
+      "sources": [
+        "https://www.erstebank.hu/hu/ebh-nyito/biztonsagi-kozpont",
+        "Erste Lakossagi Hitel Hirdetmeny 2026.02 (gate.erstebank.hu)"
+      ]
+    },
+    {
+      "id": "raiffeisen",
+      "name": "Raiffeisen Bank",
+      "category": "bank",
+      "aliases": ["Raiffeisen", "Raiffeisen Bank Zrt"],
+      "official_domains": ["raiffeisen.hu"],
+      "official_url": "https://www.raiffeisen.hu",
+      "sms_link_policy": "unknown",
+      "contacts": { "card_block_free": "+36 80 488 588" },
+      "verified": false,
+      "verify_note": "Domain es szam csak masodlagos forrasbol (bank360.hu, hovege.hu). Patrik: ellenorizd a raiffeisen.hu-n.",
+      "sources": ["https://bank360.hu/bankkartya-letiltas"]
+    },
+    {
+      "id": "cib",
+      "name": "CIB Bank",
+      "category": "bank",
+      "aliases": ["CIB"],
+      "official_domains": ["cib.hu"],
+      "official_url": "https://www.cib.hu",
+      "sms_link_policy": "unknown",
+      "contacts": { "general_and_card_block_24h": "+36 1 4242 242" },
+      "verified": false,
+      "verify_note": "Masodlagos forras. Ellenorizd a cib.hu-n.",
+      "sources": ["https://bank360.hu/bankkartya-letiltas"]
+    },
+    {
+      "id": "revolut",
+      "name": "Revolut",
+      "category": "bank",
+      "aliases": ["Revolut"],
+      "official_domains": ["revolut.com"],
+      "official_url": "https://www.revolut.com",
+      "sms_link_policy": "unknown",
+      "contacts": {},
+      "verified": false,
+      "verify_note": "Nem kutattam. Ellenorizd.",
+      "sources": []
+    },
+    {
+      "id": "posta",
+      "name": "Magyar Posta",
+      "category": "courier",
+      "aliases": ["Posta", "MPL", "Magyar Posta Zrt"],
+      "official_domains": ["posta.hu"],
+      "official_url": "https://www.posta.hu",
+      "sms_link_policy": "path_restricted",
+      "allowed_link_paths": ["posta.hu/szolgaltatasok/vam"],
+      "sms_link_policy_note": "Fizetesi SMS-t csak nemzetkozi kuldemeny vamkezelesi dija miatt kuld, mindig a posta.hu/szolgaltatasok/vam linkkel. Szallitasi cimet nem ker telefonon vagy e-mailben.",
+      "official_email_domains": ["posta.hu"],
+      "official_sms_senders": ["+36 30 344 4987"],
+      "official_sms_senders_note": "2022-es posta.hu kozlemeny. Ellenorizd, hogy aktualis-e.",
+      "contacts": {},
+      "verified": true,
+      "sources": [
+        "https://www.posta.hu/aktualitasok/adathalasz_levelet_es_smst_kuldenek_a_magyar_posta_neveben",
+        "https://www.posta.hu/aktualitasok/adathalasz_levelet_es_smst_kuldenek_a_magyar_posta_neveben_20220125"
+      ]
+    },
+    {
+      "id": "foxpost",
+      "name": "FOXPOST",
+      "category": "courier",
+      "aliases": ["Foxpost", "FoxPost Zrt", "Fox Post"],
+      "official_domains": ["foxpost.hu"],
+      "official_url": "https://foxpost.hu/csomagkovetes/",
+      "sms_link_policy": "official_only",
+      "sms_link_policy_note": "Kizarolag foxpost.hu-rol kommunikal. Maganszemelytol bankkartya- vagy bankszamla-adatot nem ker. Nyitokodot csak sikeres fizetes utan kuld (e-mail, Viber, SMS).",
+      "official_email_domains": ["foxpost.hu"],
+      "never_asks": ["card_data", "bank_account", "bank_login"],
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://foxpost.hu/adathalaszat", "https://foxpost.hu/ugyfelszolgalat"]
+    },
+    {
+      "id": "gls",
+      "name": "GLS Hungary",
+      "category": "courier",
+      "aliases": ["GLS", "GLS Hungary", "GLS Csomagpont"],
+      "official_domains": ["gls-group.com", "gls-group.eu"],
+      "official_url": "https://gls-group.com/HU/hu/home/",
+      "sms_link_policy": "official_only",
+      "sms_link_policy_note": "Sem e-mailben, sem SMS-ben nem ker fizetesi adatot. 'GLS Express' nevu ceg nem kapcsolodik hozza.",
+      "never_asks": ["card_data", "payment"],
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://gls-group.com/HU/hu/kapcsolat/", "https://gls-group.eu/HU/hu/home/"]
+    },
+    {
+      "id": "dpd",
+      "name": "DPD Hungary",
+      "category": "courier",
+      "aliases": ["DPD", "Magyar DPD", "DPD Hungary Kft"],
+      "official_domains": ["dpd.com", "dpd.hu"],
+      "official_url": "https://www.dpd.com/hu/hu/",
+      "sms_link_policy": "official_only",
+      "official_sms_senders": ["+36 70 717 7702"],
+      "official_sms_senders_note": "A DPD sajat oldala szerint kizarolag errol a szamrol kuld SMS-ertesitot.",
+      "never_asks": ["card_data", "password"],
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://www.dpd.com/hu/hu/"]
+    },
+    {
+      "id": "nav",
+      "name": "NAV",
+      "category": "government",
+      "aliases": ["NAV", "Nemzeti Adó- és Vámhivatal", "adóhivatal", "Vigyázat, csalók"],
+      "official_domains": ["nav.gov.hu", "tarhely.gov.hu"],
+      "official_url": "https://nav.gov.hu/vigyazat-csalok",
+      "sms_link_policy": "never",
+      "sms_link_policy_note": "NAV SMS-ben/e-mailben nem kuld ugyintezesi linket, ado-visszaterites/tartozas/egyenleg ertesitest, nem ker bankkartyaadatot. Tarhelyre es postan kommunikal.",
+      "official_email_senders": ["ertesites@tarhely.gov.hu"],
+      "official_email_note": "A tarhely.gov.hu ertesito SOHA nem tartalmaz csatolmanyt. Csatolmany = PIROS, akkor is ha a felado valodinak tunik.",
+      "never_asks": ["card_data", "password"],
+      "contacts": {},
+      "verified": true,
+      "sources": [
+        "https://nav.gov.hu/sajtoszoba/hirek/Kamuuzenetek_a_NAV_neveben",
+        "https://nav.gov.hu/sajtoszoba/hirek/Vigyazat_adathalaszok_A_NAV_nem_kuld_e-mailt",
+        "https://kiberpajzs.hu/hirek/csalok-kuldenek-emailt-a-nav-nevevel-visszaelve-figyelmeztetes"
+      ]
+    },
+    {
+      "id": "nusz",
+      "name": "Nemzeti Útdíjfizetési Szolgáltató",
+      "category": "government",
+      "aliases": ["NÚSZ", "Nemzeti Útdíj", "Nemzeti Útdíj Rendszer", "e-matrica", "útdíj", "pótdíj"],
+      "official_domains": ["nemzetiutdij.hu"],
+      "official_url": "https://nemzetiutdij.hu",
+      "sms_link_policy": "never",
+      "sms_link_policy_note": "Az NKFH szerint hivatalos szervek nem kuldenek azonnali fizetesre felszolito linket SMS-ben.",
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://nkfh.gov.hu/hirek/ne-kattintsunk-a-linkre-csalok-elnek-vissza-az-utdijfizetesi-rendszer-nevevel"]
+    },
+    {
+      "id": "mvm",
+      "name": "MVM Next",
+      "category": "utility",
+      "aliases": ["MVM", "MVM Next", "MVM Next Energiakereskedelmi Zrt", "villanyszámla", "gázszámla"],
+      "official_domains": ["mvmnext.hu", "mvm.hu"],
+      "official_url": "https://www.mvmnext.hu/adathalaszat",
+      "sms_link_policy": "never",
+      "sms_link_policy_note": "Hivatalos figyelmezteto uzeneteik soha nem tartalmaznak kattinthato linket.",
+      "contacts": { "report_phishing_email": "adathalasz@mvm.hu" },
+      "verified": true,
+      "sources": [
+        "https://www.mvmnext.hu/adathalaszat",
+        "https://nki.gov.hu/figyelmeztetesek/riasztas/riasztas-az-mvm-next-energiakereskedelmi-zrt-nevevel-visszaelo-sms-uzenetekkel-kapcsolatban/",
+        "https://www.police.hu/hu/hirek-es-informaciok/bunmegelozes/aktualis/ismet-adathalasz-csalasok-terjednek-az-mvm-next-neveben"
+      ]
+    },
+    {
+      "id": "telekom",
+      "name": "Magyar Telekom",
+      "category": "telco",
+      "aliases": ["Telekom", "Magyar Telekom", "T-Mobile"],
+      "official_domains": ["telekom.hu"],
+      "official_url": "https://www.telekom.hu/rolunk/telekom_vilaga/biztonsagi_tartalmak/csalas/adathalaszat",
+      "sms_link_policy": "unknown",
+      "sms_link_policy_note": "Ha a Telekom neveben szamsor SMS-ben kuldeset kerik, az csalas (egyenlegfeltoltes-atveres).",
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://www.telekom.hu/rolunk/telekom_vilaga/biztonsagi_tartalmak/csalas/adathalaszat"]
+    },
+    {
+      "id": "yettel",
+      "name": "Yettel",
+      "category": "telco",
+      "aliases": ["Yettel", "Telenor"],
+      "official_domains": ["yettel.hu"],
+      "official_url": "https://www.yettel.hu/aktualis-visszaelesek-kezelese",
+      "sms_link_policy": "unknown",
+      "official_email_senders": ["eszamla@yettel.hu"],
+      "official_email_note": "Szamlaertesito csak errol a cimrol erkezik.",
+      "contacts": {},
+      "verified": true,
+      "sources": ["https://www.yettel.hu/aktualis-visszaelesek-kezelese"]
+    },
+    {
+      "id": "one",
+      "name": "One Magyarország",
+      "category": "telco",
+      "aliases": ["One", "Vodafone"],
+      "official_domains": ["one.hu"],
+      "official_url": "https://www.one.hu",
+      "sms_link_policy": "unknown",
+      "contacts": { "technician_verification_free": "1270" },
+      "verified": false,
+      "verify_note": "A domaint nem ellenoriztem hivatalos forrasbol. Az 1270-es szam sajtobol (baon.hu) jon.",
+      "sources": ["https://www.baon.hu/helyi-kozelet/2026/02/online-csalok-dpd"]
+    },
+    {
+      "id": "police",
+      "name": "Rendőrség",
+      "category": "government",
+      "aliases": ["Rendőrség", "ORFK", "rendőr", "police"],
+      "official_domains": ["police.hu"],
+      "official_url": "https://www.police.hu",
+      "sms_link_policy": "never",
+      "sms_link_policy_note": "Rendorsegi fizetesi felszolitasnak alcazott SMS-ekre tobbszor figyelmeztettek. SMS-ben fizetesi link rendorseg neveben = PIROS.",
+      "contacts": { "emergency": "112" },
+      "verified": true,
+      "sources": ["https://www.police.hu/hu/ugyintezes/mit-tegyek"]
+    },
+    {
+      "id": "kau",
+      "name": "Ügyfélkapu+ / Magyarorszag.hu",
+      "category": "government",
+      "aliases": ["Ügyfélkapu", "Ügyfélkapu+", "DÁP", "KAÜ", "magyarorszag.hu"],
+      "official_domains": ["magyarorszag.hu", "gov.hu"],
+      "official_url": "https://magyarorszag.hu",
+      "sms_link_policy": "never",
+      "verified": false,
+      "verify_note": "Nem kutattam kulon. A gov.hu mint registrable domain tul tag lehet (minden allami aldomain), ellenorizd tldts-sel hogyan kezeli.",
+      "sources": []
+    },
+    {
+      "id": "neak",
+      "name": "NEAK",
+      "category": "government",
+      "aliases": ["NEAK", "Nemzeti Egészségbiztosítási Alapkezelő", "TAJ"],
+      "official_domains": ["neak.gov.hu"],
+      "official_url": "https://www.neak.gov.hu",
+      "sms_link_policy": "never",
+      "verified": false,
+      "verify_note": "Sajto szerint a NEAK neveben adatfrissitest vagy 'ellenorzesi dijat' kero SMS-ek terjednek. Domaint ellenorizd.",
+      "sources": ["https://www.delmagyar.hu/helyi-kozelet/2026/01/telekom-adathalasz-csalas-atveres-veszelyes"]
+    }
+  ]
+}
