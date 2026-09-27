@@ -87,19 +87,27 @@ Closed lists, no guessing.
 - Use only the enum values of the schema. If something does not fit any value, leave it out.
 - Report a request or pressure signal only if you can quote the words that show it; otherwise leave it out. Report each type at most once, with its clearest quote. Empty arrays are normal.
 - Warnings and negations are not requests: "a kódot ne adja meg senkinek" or "soha nem kérünk kártyaadatot" do not ask for anything.
+- Answering a question, rating something (e.g. "pontozz 0-10-ig") or replying to the same sender is NOT share_code; share_code needs a code or number sequence that the reader is asked to pass on or send to another number.
 - claimed_sender is who the message claims to be from (sender name, signature, logo or brand in the header); a brand that is merely mentioned is not the sender.
-- For an image, transcribe all visible text from top to bottom, including the sender name or number shown above the message, link previews and button labels. Do not describe the picture.`;
+- For an image, transcribe all visible text from top to bottom, including link previews and button labels. Do not describe the picture. If a sender name or number is visible (e.g. in the conversation header above the message), the transcript MUST start with a line "Feladó: " followed by it exactly as shown, and sender_number must be copied from that line.
+- In a screenshot, a line break caused only by text wrapping is not part of the text: join wrapped lines with a single space, and never break a link. A link wrapped over two lines is one link without any space (e.g. "telekom.hu/" + "aszfmodosulasok" → "telekom.hu/aszfmodosulasok").
+- Links include web addresses without a scheme, e.g. telekom.hu/aszfmodosulasok or foxpost.pro/atvetel.
+- Unusual or wrong accent characters (e.g. à, ò, Å instead of á, ó, Á), odd spacing or encoding glitches are NOT a signal on their own; copy them exactly as they are.`;
 
 const IMAGE_INSTRUCTION = `A fenti kép a vizsgálandó üzenet képernyőképe. Olvasd ki a benne látható összes szöveget, és hívd meg a ${TOOL_NAME} eszközt.`;
 
 const REQUEST_DEFINITIONS: Record<RequestType, string> = {
-  card_data: "asks for bank card details: kártyaszám, lejárat, CVC/CVV",
+  card_data:
+    "Arra kér, hogy add meg a bankkártyád adatait (kártyaszám, lejárat, CVC/CVV). NEM card_data, ha az üzenet csak a fizetési módot említi (pl. „bankkártyával is fizethet”).",
   password: "asks for a password, PIN or netbank/app login credentials (jelszó, PIN, belépési adatok)",
-  share_code: "asks to pass on, forward, read out or enter an SMS/verification code (kód megadása, továbbítása)",
-  money_transfer: "asks to transfer or send money (utalás, pénzküldés), incl. to a 'safe account'",
+  share_code:
+    "Arra kér, hogy egy kapott vagy bediktált kódot/számsort adj tovább vagy küldj el egy MÁSIK számra. NEM share_code, ha egy kérdésre (pl. 0-10 értékelés) kell válaszolni ugyanannak a feladónak.",
+  money_transfer:
+    "Arra kér, hogy online, linken keresztül vagy bankszámlára fizess vagy utalj (utalás, pénzküldés, „biztonsági számla”). NEM money_transfer: utánvét (fizetés a futárnál, átvételkor).",
   app_install: "asks to install/download an app, e.g. remote-access software (AnyDesk, TeamViewer) or an .apk",
   personal_data: "asks for personal data: név, cím, születési dátum, anyja neve, személyi/TAJ/adószám",
-  call_back: "asks the reader to call a given phone number (hívja vissza, hívja a ... számot)",
+  call_back:
+    "Felszólít, hogy hívj fel egy telefonszámot (hívja vissza, hívja a … számot). NEM call_back, ha az üzenet csak megad egy számot (pl. ügyfélszolgálati elérhetőség) felszólítás nélkül.",
   click_link: "asks the reader to click/open/tap a link (kattintson, nyissa meg a linket)",
 };
 
@@ -157,7 +165,7 @@ export function buildReportSignalsTool(entities: OfficialEntity[]): Anthropic.To
       type: "array",
       items: { type: "string" },
       description:
-        "Every visible link or web address, character by character exactly as shown (keep typos, do not add https:// or www., do not decode or shorten). Empty array if none.",
+        "Every visible link or web address, including ones without a scheme (e.g. telekom.hu/aszfmodosulasok), character by character exactly as shown (keep typos, do not add https:// or www., do not decode or shorten; a link wrapped over lines in a screenshot is one link without spaces). Empty array if none.",
     },
     claimed_sender: {
       type: "string",

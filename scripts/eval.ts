@@ -6,7 +6,7 @@
 // Sikerkritérium: scam soha nem SZÜRKE, legit soha nem PIROS. Bukásnál a kilépési kód 1.
 import { readdirSync, readFileSync } from "node:fs";
 import { extname, join } from "node:path";
-import { ENTITIES } from "@/lib/kb";
+import { ENTITIES, foldAccents } from "@/lib/kb";
 import { extractWithClaude } from "@/lib/extract";
 import { stubExtract } from "@/lib/extract-stub";
 import { runCheck, type CheckInput, type Extractor, type ImageMediaType } from "@/lib/pipeline";
@@ -16,29 +16,52 @@ const args = new Set(process.argv.slice(2));
 const target = process.argv.find((a) => a.startsWith("--target="))?.slice("--target=".length).replace(/\/$/, "");
 const mode: "live" | "stub" | "target" = target ? "target" : process.env.ANTHROPIC_API_KEY && !args.has("--stub") ? "live" : "stub";
 const follow = args.has("--follow");
+// --only=a,b  csak ezek az id-k (vagy id-előtagok) futnak
+const only = process.argv.find((a) => a.startsWith("--only="))?.slice("--only=".length).split(",").filter(Boolean);
 
 const FIXTURE_DIR = "tests/fixtures";
 const LABEL: Record<Verdict, string> = { gray: "SZÜRKE", yellow: "SÁRGA", red: "PIROS" };
+
+// Sikerkritérium + (ha a minta megadja) az elvárt ítélet pontos egyezése.
+function passes(s: EvalSample, verdict: Verdict): boolean {
+  const criterion = s.expected === "scam" ? verdict !== "gray" : verdict !== "red";
+  const fold = (x: string) => foldAccents(x.normalize("NFC")).toUpperCase();
+  const exact = !s.expect_verdict || fold(s.expect_verdict) === fold(LABEL[verdict]);
+  return criterion && exact;
+}
 const MEDIA: Record<string, ImageMediaType> = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp" };
 
 type LegacyFixture = { id: string; input_text?: string; image_path?: string; expected: "scam" | "legit"; note?: string; synthetic?: boolean };
 
-function loadSamples(): Sample[] {
-  const samples: Sample[] = [];
+type EvalSample = Sample & { expect_verdict?: string };
+
+// Ha egy mintának szövege ÉS képe is van, két változatban fut: [szöveg] (Feladó: sorral) és [kép] (csak a képernyőkép).
+function variants(s: EvalSample): EvalSample[] {
+  if (!s.text || !s.image_path) return [s];
+  return [
+    { ...s, id: `${s.id} [szöveg]`, image_path: undefined },
+    { ...s, id: `${s.id} [kép]`, text: undefined, sender: undefined },
+  ];
+}
+
+function loadSamples(): EvalSample[] {
+  const samples: EvalSample[] = [];
   for (const file of readdirSync(FIXTURE_DIR).filter((f) => f.endsWith(".json")).sort()) {
     const data = JSON.parse(readFileSync(join(FIXTURE_DIR, file), "utf8"));
-    if (Array.isArray(data.samples)) samples.push(...(data.samples as Sample[]));
+    if (Array.isArray(data.samples)) samples.push(...(data.samples as EvalSample[]).flatMap(variants));
     else {
       const f = data as LegacyFixture;
       samples.push({ id: f.id, expected: f.expected, text: f.input_text, image_path: f.image_path, note: f.note, synthetic: f.synthetic });
     }
   }
-  return samples;
+  return only ? samples.filter((s) => only.some((o) => s.id.startsWith(o))) : samples;
 }
 
 // A feladó száma a screenshoton látszik; szöveges mintánál "Feladó:" sorként kerül a szöveg elé.
-function toInput(s: Sample): CheckInput {
-  const text = [s.sender ? `Feladó: ${s.sender}` : "", s.text ?? ""].filter(Boolean).join("\n");
+function toInput(s: EvalSample): CheckInput {
+  // Csak telefonszám-alakú feladó kerül a szöveg elé (a fixture-megjegyzés, pl. "ismeretlen (…)", nem része az üzenetnek).
+  const sender = s.sender && /^\+?[\d\s()/-]{6,}$/.test(s.sender.trim()) ? s.sender.trim() : "";
+  const text = [sender ? `Feladó: ${sender}` : "", s.text ?? ""].filter(Boolean).join("\n");
   if (!s.image_path) return { text };
   return {
     text,
@@ -72,7 +95,7 @@ async function main() {
   console.log(
     `Eval: ${samples.length} minta, mód: ${mode}${mode === "stub" ? " (nincs ANTHROPIC_API_KEY vagy --stub)" : ""}${target ? ` → ${target}` : ""}, redirect-követés: ${mode === "target" ? "szerveroldalon be" : follow ? "be" : "ki"}\n`,
   );
-  console.log(`${pad("id", 34)} ${pad("várt", 6)} ${pad("kapott", 7)} ${pad("pont", 5)} ok  jelek`);
+  console.log(`${pad("id", 44)} ${pad("várt", 6)} ${pad("kapott", 7)} ${pad("pont", 5)} ok  jelek`);
   console.log("-".repeat(120));
 
   let failures = 0;
@@ -81,7 +104,7 @@ async function main() {
   for (const s of samples) {
     if (s.image_path && mode === "stub") {
       skipped++;
-      console.log(`${pad(s.id, 34)} ${pad(s.expected, 6)} ${pad("-", 7)} ${pad("-", 5)} --  kihagyva: képes minta stub módban nem futtatható`);
+      console.log(`${pad(s.id, 44)} ${pad(s.expected, 6)} ${pad("-", 7)} ${pad("-", 5)} --  kihagyva: képes minta stub módban nem futtatható`);
       continue;
     }
     const started = Date.now();
@@ -89,14 +112,14 @@ async function main() {
     try {
       if (mode === "target") {
         const { verdict, detail } = await checkRemote(toInput(s));
-        const ok = s.expected === "scam" ? verdict !== "gray" : verdict !== "red";
+        const ok = passes(s, verdict);
         if (!ok) failures++;
         latencies.push(Date.now() - started);
-        console.log(`${pad(s.id, 34)} ${pad(s.expected, 6)} ${pad(LABEL[verdict], 7)} ${pad("-", 5)} ${ok ? "OK" : "XX"}  ${Date.now() - started}ms ${detail}`);
+        console.log(`${pad(s.id, 44)} ${pad(s.expected, 6)} ${pad(LABEL[verdict], 7)} ${pad("-", 5)} ${ok ? "OK" : "XX"}  ${Date.now() - started}ms ${detail}`);
         continue;
       }
       const { result } = await runCheck(toInput(s), { extract, followRedirects: follow, compareUrls: mode === "live" });
-      const ok = s.expected === "scam" ? result.verdict !== "gray" : result.verdict !== "red";
+      const ok = passes(s, result.verdict);
       if (!ok) failures++;
       const signals = [
         ...result.hard_rules.map((h) => `!${h.rule}`),
@@ -104,10 +127,10 @@ async function main() {
         ...result.caps.map((c) => `[${c}]`),
       ].join(" ");
       const ms = mode === "live" ? ` ${Date.now() - started}ms` : "";
-      line = `${pad(s.id, 34)} ${pad(s.expected, 6)} ${pad(LABEL[result.verdict], 7)} ${pad(String(result.score), 5)} ${ok ? "OK" : "XX"}  ${signals}${ms}`;
+      line = `${pad(s.id, 44)} ${pad(s.expected, 6)} ${pad(LABEL[result.verdict], 7)} ${pad(String(result.score), 5)} ${ok ? "OK" : "XX"}  ${signals}${ms}`;
     } catch (err) {
       failures++;
-      line = `${pad(s.id, 34)} ${pad(s.expected, 6)} ${pad("HIBA", 7)} ${pad("-", 5)} XX  ${err instanceof Error ? err.name : "ismeretlen hiba"}`;
+      line = `${pad(s.id, 44)} ${pad(s.expected, 6)} ${pad("HIBA", 7)} ${pad("-", 5)} XX  ${err instanceof Error ? err.name : "ismeretlen hiba"}`;
     }
     console.log(line);
   }
@@ -119,7 +142,7 @@ async function main() {
   }
   console.log("-".repeat(120));
   console.log(
-    `Sikerkritérium (scam soha nem SZÜRKE, legit soha nem PIROS): ${failures === 0 ? "TELJESÜL" : "BUKIK"} — ${run - failures}/${run} rendben${skipped ? `, ${skipped} kihagyva` : ""}`,
+    `Sikerkritérium (scam soha nem SZÜRKE, legit soha nem PIROS; + elvárt ítélet, ha a minta megadja): ${failures === 0 ? "TELJESÜL" : "BUKIK"} — ${run - failures}/${run} rendben${skipped ? `, ${skipped} kihagyva` : ""}`,
   );
   process.exit(failures === 0 ? 0 : 1);
 }

@@ -80,3 +80,21 @@ describe("verifyEvidence", () => {
     });
   });
 });
+
+describe("share_code tartalmi kapu", () => {
+  const base = { urls_verbatim: [], claimed_sender: "telekom", pressure: [], contains_code_only: false, instructions_to_ai: false, sender_number: null, has_attachment: false };
+  it("értékelés kérése (0–10 pontozás) nem share_code", () => {
+    const transcript = "Kérjük, hogy 10-es skálán pontozz, ahol a 10=kimondottan ajánlanám.";
+    const out = verifyEvidence({ ...base, transcript, requests: [{ type: "share_code", evidence: "Kérjük, hogy 10-es skálán pontozz" }] });
+    expect(out.requests).toEqual([]);
+  });
+  it("kód vagy számsor továbbküldése share_code marad (ékezet nélkül is)", () => {
+    const transcript = "Kuldje el a kapott kodot erre a szamra. Olvassa fel a bediktalt számsort.";
+    const out = verifyEvidence({
+      ...base,
+      transcript,
+      requests: [{ type: "share_code", evidence: "Kuldje el a kapott kodot" }],
+    });
+    expect(out.requests.map((r) => r.type)).toEqual(["share_code"]);
+  });
+});

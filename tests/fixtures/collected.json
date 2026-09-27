@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "note": "Patrik telefonjara tenylegesen erkezett (gyujtott) uzenetek. Az expected mezo mondja meg, csalo-e. Kepes es szoveges teszt is fusson mindegyikre.",
+    "success_criteria": "scam soha nem SZURKE, legit soha nem PIROS"
+  },
+  "samples": [
+    {
+      "id": "collected_dpd_plus91",
+      "expected": "scam",
+      "image_path": "tests/fixtures/images/collected_dpd_plus91.png",
+      "sender": "+91 99451 83370",
+      "text": "DPD Hungária: Nem tudtuk kézbesíteni csomagját, mert a megadott kézbesítési cím hiányos vagy nem ellenőrizhető. Kérjük, frissítse kézbesítési adatait az újrakézbesítéshez: https://dpd-comw.cfd/i?hye=0fvvuC",
+      "expect_verdict": "PIROS",
+      "expect_signals": [
+        "hasonmas domain (dpd-comw.cfd, markanev a domainben)",
+        "kockazatos TLD (.cfd)",
+        "foreign_sender_for_hu_entity (+91)",
+        "sender_number_mismatch (DPD csak +36 70 717 7702)",
+        "personal_data"
+      ]
+    },
+    {
+      "id": "collected_telekom_plus30",
+      "expected": "scam",
+      "image_path": "tests/fixtures/images/collected_telekom_plus30.png",
+      "sender": "+30 699 4471965",
+      "text": "Telekom: Az On fiokjaban levo 5340 pont 2026.3.25-en lejar! Valtsa be exkluziv ajandekait: https://oshkl.top/Telekom Koszonjuk, hogy a Telekomot valasztja!",
+      "expect_verdict": "PIROS",
+      "expect_signals": [
+        "allitott szervezet + nem hivatalos domain (oshkl.top)",
+        "markanev csak az URL utvonalaban, nem a domainben",
+        "kockazatos TLD (.top)",
+        "foreign_sender_for_hu_entity (+30 = Gorogorszag, NEM magyar 30-as korzet)",
+        "prize",
+        "deadline",
+        "ekezet nelkuli szoveg"
+      ]
+    },
+    {
+      "id": "collected_telekom_plus90_shortener",
+      "expected": "scam",
+      "image_path": "tests/fixtures/images/collected_telekom_plus90.png",
+      "sender": "+90 542 437 04 93",
+      "text": "Tisztelt Magyar Telekom Ügyfelünk: A márciusi számlahasználat alapján fiókja 5 525 ponttal gyarapodott. Pontjait egyenértékű ajándékokra válthatja be. Ha nem használja fel pontjait, azok április 2-jén lejárnak. Nézze meg, milyen ajándékokra válthatja be pontjait: https://rb.gy/ske9if?ZeV=Rc0Xk9 Köszönjük, hogy a Magyar Telekomot választotta!",
+      "expect_verdict": "PIROS",
+      "expect_signals": [
+        "allitott szervezet + nem hivatalos domain (rb.gy)",
+        "linkrovidito",
+        "foreign_sender_for_hu_entity (+90)",
+        "prize",
+        "deadline"
+      ],
+      "note": "A rovidito mar valoszinuleg halott. Az iteletnek feloldas NELKUL is PIROS-nak kell lennie."
+    },
+    {
+      "id": "collected_telekom_nps_survey",
+      "expected": "legit",
+      "sender": "ismeretlen (Patrik szerint hivatalos Telekom)",
+      "text": "Kedves Ügyfelünk! Köszönjük, hogy felkerested üzletünket. Véleményed fontos számunkra: kérjük, oszd meg velünk tapasztalataidat. A kérdőív kitöltése mindössze 3 percet fog igénybe venni. A válasz SMS-ek díjmentesek belföldön. Köszönjük előre is! A Telekom Ügyfélélmény Csapata. A Telekom üzletben tett legutóbbi látogatásod során tapasztaltak alapján mennyire ajánlanád a Telekom szolgáltatót barátaidnak, családtagjaidnak? Kérjük, hogy 10-es skálán pontozz, ahol a 10=kimondottan ajánlanám és a 0=egyáltalán nem ajánlanám.",
+      "expect_verdict": "SZURKE",
+      "expect_signals": [],
+      "trap": "NEM share_code: egy 0-10 pontszam valaszkent ugyanannak a feladonak nem 'bediktalt szamsor kuldese masik szamra'. Ha az AI share_code-nak jeloli, kemeny PIROS lesz egy valodi uzeneten.",
+      "note": "Nincs link, nincs penz, nincs adatkeres, nincs nyomas."
+    },
+    {
+      "id": "collected_telekom_aszf",
+      "expected": "legit",
+      "image_path": "tests/fixtures/images/collected_telekom_aszf.png",
+      "text": "Tisztelt Ügyfelünk! Tàjékoztatjuk, hogy 2025.07.01-jétöl Lakossàgi Åltalànos szerzödési feltételeink (ÅSZF) mòdosulnak. Részleteket 2025.05.31. napjàtòl a telekom.hu/aszfmodosulasok oldalon talàl. A mòdosìtàssal kapcsolatos elöfizetöi jogokat az ÅSZF 9.1.3. pontja tartalmazza. Üdvözlettel: Telekom",
+      "expect_signals": [
+        "hivatalos domain (telekom.hu, séma nélkül)",
+        "furcsa ékezet önmagában nem jel"
+      ],
+      "note": "Patrik képernyőképe (2026-09-27). A szöveges változatot Claude írta át a képről, a furcsa ékezetekkel együtt; feladó nem látszik a képen."
+    }
+  ]
+}

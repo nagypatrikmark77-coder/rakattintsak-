@@ -12,7 +12,8 @@
     "eval": "tsx --env-file-if-exists=.env.local scripts/eval.ts",
     "icons": "node scripts/icons.mjs",
     "check:privacy": "node scripts/check-privacy.mjs",
-    "test:db": "tsx --env-file-if-exists=.env.local scripts/test-db.ts"
+    "test:db": "tsx --env-file-if-exists=.env.local scripts/test-db.ts",
+    "e2e:family": "tsx --env-file-if-exists=.env.local scripts/e2e-family.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

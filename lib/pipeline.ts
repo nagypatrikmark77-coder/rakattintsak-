@@ -1,7 +1,7 @@
 // A teljes ellenőrzés: kiolvasás → idézet-ellenőrzés → kulcsszó-tartalék → linkek → ítélet → válasz.
 // Minden memóriában fut; semmit nem ment és nem naplóz.
 import { ENTITIES, PATTERNS } from "./kb";
-import { analyzeLink, applyRedirect, extractUrls, urlSetsDiffer } from "./links";
+import { analyzeLink, applyRedirect, extractUrls, repairWrappedUrls, urlSetsDiffer } from "./links";
 import { followRedirects } from "./redirects";
 import { verifyEvidence } from "./evidence";
 import { findKeywordSignals, mergeSignals } from "./keywords";
@@ -25,8 +25,12 @@ export type CheckOutcome = { response: CheckResponse; result: VerdictResult; sig
 
 const MAX_FOLLOWED_LINKS = 5;
 
-async function analyzeLinks(transcript: string, follow: boolean): Promise<{ raws: string[]; links: LinkAnalysis[] }> {
-  const raws = extractUrls(transcript);
+async function analyzeLinks(
+  transcript: string,
+  follow: boolean,
+  modelUrls: string[] = [],
+): Promise<{ raws: string[]; links: LinkAnalysis[] }> {
+  const raws = repairWrappedUrls(extractUrls(transcript), modelUrls, transcript);
   const analyzed = raws.map((raw) => analyzeLink(raw, ENTITIES));
   if (!follow) return { raws, links: analyzed };
   const links = await Promise.all(
@@ -45,7 +49,7 @@ export async function runCheck(input: CheckInput, opts: PipelineOptions): Promis
   const earlyLinks = textOnly ? analyzeLinks(text, opts.followRedirects) : null;
 
   const extraction = verifyEvidence(await opts.extract({ ...input, text }, text ? extractUrls(text) : []));
-  const { raws, links } = await (earlyLinks ?? analyzeLinks(extraction.transcript, opts.followRedirects));
+  const { raws, links } = await (earlyLinks ?? analyzeLinks(extraction.transcript, opts.followRedirects, extraction.urls_verbatim));
 
   const hits = findKeywordSignals(extraction.transcript, PATTERNS);
   const merged = mergeSignals(extraction, hits);

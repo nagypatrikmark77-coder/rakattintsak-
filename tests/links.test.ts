@@ -340,3 +340,15 @@ describe("applyRedirect: az útvonal-szabály a látható linkre vonatkozik", ()
     expect(out.allowed_path_entity_ids).toEqual([]);
   });
 });
+
+describe("repairWrappedUrls: sortöréssel megtört link", () => {
+  it("a transcriptben szóközzel megtört linket a modell teljes linkjére cseréli", async () => {
+    const { repairWrappedUrls } = await import("@/lib/links");
+    const t = "Részleteket a telekom.hu/ aszfmodosulasok oldalon talàl.";
+    expect(repairWrappedUrls(["telekom.hu/"], ["telekom.hu/aszfmodosulasok"], t)).toEqual(["telekom.hu/aszfmodosulasok"]);
+  });
+  it("nem cserél, ha a modell linkje nem szerepel a transcriptben (téves olvasás marad téves)", async () => {
+    const { repairWrappedUrls } = await import("@/lib/links");
+    expect(repairWrappedUrls(["telekom.hu/"], ["telekom.hu/masik"], "a telekom.hu/ aszf oldalon")).toEqual(["telekom.hu/"]);
+  });
+});

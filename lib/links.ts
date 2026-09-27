@@ -193,3 +193,17 @@ export function urlSetsDiffer(a: string[], b: string[]): boolean {
   const sb = new Set(b.map(normalizeUrlForCompare));
   return sa.size !== sb.size || [...sa].some((x) => !sb.has(x));
 }
+
+// Képernyőképen sortöréssel megtört link: a transcriptben "telekom.hu/ aszfmodosulasok", a modell linklistájában
+// "telekom.hu/aszfmodosulasok". Ha a regex-találat a modell egyik linkjének eleje, és a teljes link a transcriptben
+// csak whitespace-szel megszakítva szerepel, a teljes linket használjuk.
+export function repairWrappedUrls(raws: string[], modelUrls: string[], transcript: string): string[] {
+  const squeeze = (s: string) => s.replace(/\s+/g, "");
+  const joined = squeeze(transcript);
+  return raws.map((raw) => {
+    const full = modelUrls.find(
+      (u) => u.length > raw.length && squeeze(u).startsWith(squeeze(raw)) && joined.includes(squeeze(u)),
+    );
+    return full ?? raw;
+  });
+}

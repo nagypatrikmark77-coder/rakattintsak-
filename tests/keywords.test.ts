@@ -211,3 +211,17 @@ describe("detectClaimedSender", () => {
     expect(d("Üzenet a K&H-tól")).toBe("kh");
   });
 });
+
+describe("utánvét nem online pénzkérés", () => {
+  const types = (t: string) => {
+    const h = findKeywordSignals(t, PATTERNS);
+    return [...h.requests, ...h.pressure].map((x) => x.type);
+  };
+  it("a futárnál fizetendő utánvét nem money_transfer", () => {
+    expect(types("A csomag ára 5 990 Ft, fizesse ki a futárnál utánvéttel.")).not.toContain("money_transfer");
+    expect(types("Fizessen átvételkor a futárnak.")).not.toContain("money_transfer");
+  });
+  it("az online fizetésre felszólítás továbbra is money_transfer", () => {
+    expect(types("Fizesse ki a díjat ezen a linken: https://x.hu")).toContain("money_transfer");
+  });
+});

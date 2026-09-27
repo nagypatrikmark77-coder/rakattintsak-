@@ -76,6 +76,18 @@ const INSTRUCTIONS = new RegExp(
   "iu",
 );
 
+// Mondat-szintű kizárás: az utánvét (fizetés a futárnál, átvételkor) nem online pénzkérés.
+const EXCLUSIONS: Partial<Record<SignalType, RegExp>> = {
+  money_transfer: /utanvet|futarnal|futarnak|atvetelkor/i,
+};
+function excluded(type: SignalType, folded: string, at: number): boolean {
+  const re = EXCLUSIONS[type];
+  if (!re) return false;
+  const start = Math.max(...[".", "!", "?", "\n"].map((c) => folded.lastIndexOf(c, at - 1))) + 1;
+  const ends = [".", "!", "?", "\n"].map((c) => folded.indexOf(c, at)).filter((i) => i >= 0);
+  return re.test(folded.slice(start, ends.length ? Math.min(...ends) : folded.length));
+}
+
 export function findKeywordSignals(transcript: string, patterns: ScamPatterns): KeywordSignals {
   const text = transcript.normalize("NFC");
   const folded = foldAccents(text);
@@ -85,7 +97,7 @@ export function findKeywordSignals(transcript: string, patterns: ScamPatterns): 
   const hits: { type: SignalType; evidence: string; at: number }[] = [];
   for (const [type, kws] of Object.entries(all) as [SignalType, string[]][]) {
     const hit = kws.length ? firstHit(folded, kws) : null;
-    if (hit) hits.push({ type, evidence: text.slice(hit[0], hit[1]), at: hit[0] });
+    if (hit && !excluded(type, folded, hit[0])) hits.push({ type, evidence: text.slice(hit[0], hit[1]), at: hit[0] });
   }
   hits.sort((a, b) => a.at - b.at);
   const isRequest = (t: SignalType): t is RequestType => (REQUEST_TYPES as readonly string[]).includes(t);
