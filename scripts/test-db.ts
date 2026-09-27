@@ -104,6 +104,7 @@ async function main() {
     check("hit_limits kliensről nem hívható", !!rpcError);
   } finally {
     for (const id of created) await admin.auth.admin.deleteUser(id);
+    await admin.from("rate_limits").delete().like("ip_hash", "teszt-%");
   }
 
   console.log(`\nAdatbázis-kapu: ${failures === 0 ? "RENDBEN" : `${failures} HIBA`}`);
