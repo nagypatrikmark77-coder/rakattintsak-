@@ -326,3 +326,17 @@ describe("hasonmás: köznyelvi szavak és állami aldomainek nem adnak hamis ri
     ["https://nav.gov.hu.adoellenorzes.info", "nav"],
   ])("%s → %s", (raw, id) => expect(la(raw)).toBe(id));
 });
+
+describe("applyRedirect: az útvonal-szabály a látható linkre vonatkozik", () => {
+  const vam = () => analyzeLink("https://www.posta.hu/szolgaltatasok/vam", ENTITIES);
+  it("hivatalos Posta-aldomainre továbbító vámlink megtartja a megengedett útvonalat (valódi 301 → net.posta.hu)", () => {
+    const out = applyRedirect(vam(), { final_url: "https://net.posta.hu/dashboard/public/dashboard-ui/vam/", hops: 1, error: null }, ENTITIES);
+    expect(out.official_entity_ids).toEqual(["posta"]);
+    expect(out.allowed_path_entity_ids).toEqual(["posta"]);
+  });
+  it("idegen domainre továbbító vámlink elveszti a hivatalos státuszt és a megengedett útvonalat", () => {
+    const out = applyRedirect(vam(), { final_url: "https://posta-fizetes.top/vam", hops: 1, error: null }, ENTITIES);
+    expect(out.official_entity_ids).toEqual([]);
+    expect(out.allowed_path_entity_ids).toEqual([]);
+  });
+});

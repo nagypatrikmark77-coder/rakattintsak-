@@ -169,7 +169,9 @@ export function applyRedirect(
     ...out,
     official_entity_ids: both(link.official_entity_ids, fin.official_entity_ids),
     listed_unverified_entity_ids: both(link.listed_unverified_entity_ids, fin.listed_unverified_entity_ids),
-    allowed_path_entity_ids: both(link.allowed_path_entity_ids, fin.allowed_path_entity_ids),
+    // Az útvonal-szabály a szervezet által küldött (látható) linkre vonatkozik; a végcélnak elég
+    // a szervezet hivatalos domainjén maradnia (pl. posta.hu/szolgaltatasok/vam → net.posta.hu/…/vam/).
+    allowed_path_entity_ids: both(link.allowed_path_entity_ids, [...fin.official_entity_ids, ...fin.listed_unverified_entity_ids]),
     lookalike_of: link.lookalike_of ?? fin.lookalike_of,
     punycode: link.punycode || fin.punycode,
     ip_host: link.ip_host || fin.ip_host,
